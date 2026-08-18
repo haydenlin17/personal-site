@@ -20,7 +20,7 @@ export function SiteFooter() {
           >
             LinkedIn
           </a>
-          <a className="transition hover:text-ink" href={person.resume} target="_blank" rel="noreferrer">
+          <a className="transition hover:text-ink" href={person.resume} download="Hayden-Lin-Resume.pdf">
             Resume
           </a>
           <Link className="transition hover:text-ink" href="/channels">

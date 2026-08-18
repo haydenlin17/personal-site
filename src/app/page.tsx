@@ -204,11 +204,10 @@ export default function ProfilePage() {
             </a>
             <a
               href={person.resume}
-              target="_blank"
-              rel="noreferrer"
+              download="Hayden-Lin-Resume.pdf"
               className="rounded-full border border-rule-strong px-5 py-2.5 text-[14px] font-medium text-ink transition hover:border-ink hover:bg-sunk"
             >
-              Resume
+              Download resume
             </a>
           </div>
           <p className="mt-6 text-[13px] text-ink-muted">
@@ -236,27 +235,23 @@ function Hero() {
       >
         {person.intro}
       </p>
-      <div className="rise mt-8 flex flex-wrap gap-3" style={{ animationDelay: "180ms" }}>
-        <a
-          href="#experience"
-          className="rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-paper transition hover:bg-accent-soft"
-        >
-          View experience
-        </a>
-        <a
+      <div
+        className="rise mt-9 grid max-w-2xl gap-3 sm:grid-cols-2"
+        style={{ animationDelay: "180ms" }}
+      >
+        <ActionCard
           href={person.resume}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded-full border border-rule-strong px-5 py-2.5 text-[14px] font-medium text-ink transition hover:border-ink hover:bg-sunk"
-        >
-          Resume
-        </a>
-        <a
+          download="Hayden-Lin-Resume.pdf"
+          title="Download resume"
+          detail="PDF, one page, 120 KB"
+          icon={<DownloadIcon />}
+        />
+        <ActionCard
           href={`mailto:${person.email}`}
-          className="rounded-full border border-rule-strong px-5 py-2.5 text-[14px] font-medium text-ink transition hover:border-ink hover:bg-sunk"
-        >
-          Contact
-        </a>
+          title="Send me an email"
+          detail={person.email}
+          icon={<MailIcon />}
+        />
       </div>
 
       <dl className="rise mt-14 grid grid-cols-2 border-t border-rule sm:grid-cols-4" style={{ animationDelay: "240ms" }}>
@@ -288,5 +283,82 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
         ))}
       </ul>
     </div>
+  );
+}
+
+/**
+ * The two things a visitor is most likely to want, said plainly. A pill reading
+ * "Resume" leaves them guessing whether it opens, downloads, or scrolls; this
+ * says which, and what they are getting.
+ */
+function ActionCard({
+  href,
+  title,
+  detail,
+  icon,
+  download,
+}: {
+  href: string;
+  title: string;
+  detail: string;
+  icon: React.ReactNode;
+  download?: string;
+}) {
+  return (
+    <a
+      href={href}
+      download={download}
+      className="group flex items-center gap-4 rounded-lg border border-rule bg-surface px-4 py-4 transition hover:border-accent hover:bg-sunk"
+    >
+      <span className="grid size-10 shrink-0 place-items-center rounded-full border border-rule bg-paper text-accent transition group-hover:border-accent">
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[15px] font-semibold text-ink">{title}</span>
+        <span className="mt-0.5 block truncate text-[13px] text-ink-muted">{detail}</span>
+      </span>
+      <svg
+        viewBox="0 0 24 24"
+        className="size-4 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-accent"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        aria-hidden
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+      </svg>
+    </a>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-[18px]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      aria-hidden
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v11m0 0 4-4m-4 4-4-4" />
+      <path strokeLinecap="round" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+    </svg>
+  );
+}
+
+function MailIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-[18px]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      aria-hidden
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2.5" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="m3.5 7.5 7.4 5.2a2 2 0 0 0 2.2 0l7.4-5.2" />
+    </svg>
   );
 }

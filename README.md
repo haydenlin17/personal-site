@@ -22,6 +22,8 @@ Almost everything is data, not markup.
 | Skills, platforms, credentials, honors | `src/lib/content.ts` |
 | Header section links | `src/lib/content.ts` (`sections`) |
 | Channel list, names, niches | `src/lib/channels.ts` |
+| Whether channels are named publicly | `src/lib/channels.ts` (`privacy`) |
+| Proof screenshots and their captions | `src/lib/channels.ts` (`proofShots`) |
 | Resume PDF | `public/Hayden-Lin-Resume.pdf` |
 
 Colours for both themes live at the top of `src/app/globals.css`, as two blocks of
@@ -40,6 +42,54 @@ CSS variables (`:root` for light, `.dark` for dark). Nothing else hardcodes a co
 
 Subscriber counts arrive rounded to three significant figures on every path,
 because that is all YouTube publishes. View and video counts are exact.
+
+### Privacy
+
+The channels are run facelessly, so `privacy.anonymous` in `src/lib/channels.ts`
+keeps this site from linking them to a real name. It is not a CSS trick: with it
+on, the name, handle, avatar and channel URL are dropped in `toStats()` before
+the payload is built, so they are absent from the page source and from
+`/api/channels` too. Cards show an ordinal and a niche instead.
+
+Exact per channel figures are still a fingerprint. Anyone who cares to search a
+subscriber and view count can find the channel behind it. Setting
+`privacy.showPerChannel` to false as well publishes only the network totals and
+the screenshots, which is the only configuration that genuinely cannot be traced
+back.
+
+The persisted view history in Blob is keyed by the same opaque ordinals, so
+nothing identifying is written there either.
+
+### The live view counter
+
+Channel view totals move, so the counter should too. `viewsPerSecond` comes back
+with every payload and the client projects forward from `viewsAt`, which is what
+keeps the number climbing between ten minute reads instead of sitting still.
+
+Working out that rate is the fiddly part. YouTube publishes channel view totals
+in lumps hours apart, not continuously, so dividing a delta by the polling
+interval measures YouTube's publishing schedule rather than the channel. Two
+things prevent that:
+
+- A reading's timestamp records when the total *became* true, not when it was
+  last confirmed. An unchanged reading keeps the timestamp it arrived with.
+- A rate is only derived once those two timestamps sit at least three hours
+  apart.
+
+Until a channel has two readings that far apart, the rate is its lifetime
+average, `views / age`. That is deliberately conservative: it undercounts a
+channel that scaled recently, and undercounting only means the number catches up
+at the next read, while overcounting means it overshoots and has to visibly fall
+back. The first real measurement replaces the seed outright, and later ones are
+blended in at half weight so a single wide gap cannot redefine the rate.
+
+**A newly deployed site ticks slowly for the first few hours.** It is running on
+lifetime averages until it has watched the channels long enough to measure them.
+That is expected and it corrects itself.
+
+Readings persist to Vercel Blob via `BLOB_READ_WRITE_TOKEN`. Without that
+variable the history lives in memory only, which a serverless cold start wipes,
+and the rate never gets past the lifetime seed.
 
 The read is cached for ten minutes and shared by every visitor, so a busy day
 still means six reads an hour. `/channels` is prerendered with real numbers, then
@@ -77,3 +127,10 @@ npm run build
 ```bash
 npx vercel --prod
 ```
+
+## Environment
+
+| Variable | Needed for | Without it |
+| --- | --- | --- |
+| `BLOB_READ_WRITE_TOKEN` | Persisting view readings between invocations | Live counter never leaves its lifetime-average seed |
+| `YOUTUBE_API_KEY` | Official Data API instead of scraping | Falls back to scraping, which currently works |

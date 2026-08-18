@@ -1,11 +1,15 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CountUp } from "./count-up";
+import { privacy, proofShots } from "@/lib/channels";
 import type { ChannelStats, StatsPayload } from "@/lib/youtube";
 
 /** How often the page asks again. The endpoint itself is cached for ten minutes. */
 const REFRESH_MS = 60_000;
+
+const nf = new Intl.NumberFormat("en-US");
 
 /**
  * The server hands over a full payload, so the page paints real numbers with no
@@ -53,11 +57,18 @@ export function ChannelsLive({ initial }: { initial: StatsPayload }) {
     };
   }, [refresh]);
 
+  const stale = data.degraded || failing;
+
   return (
     <>
       <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-rule bg-rule sm:grid-cols-3">
         <Total label="Total subscribers" value={data.totals.subscribers} />
-        <Total label="Lifetime views" value={data.totals.views} />
+        <Total
+          label="Lifetime views"
+          value={data.totals.views}
+          perSecond={data.totals.viewsPerSecond}
+          since={data.fetchedAt}
+        />
         <Total label="Videos published" value={data.totals.videos} />
       </div>
 
@@ -65,11 +76,11 @@ export function ChannelsLive({ initial }: { initial: StatsPayload }) {
         <p className="flex items-center gap-2 text-[13px] text-ink-muted">
           <span
             aria-hidden
-            className={`size-1.5 rounded-full ${
-              data.degraded || failing ? "bg-rule-strong" : "bg-accent"
-            } ${loading ? "animate-pulse" : ""}`}
+            className={`size-1.5 rounded-full ${stale ? "bg-rule-strong" : "bg-accent"} ${
+              loading ? "animate-pulse" : ""
+            }`}
           />
-          {data.degraded || failing ? "Showing cached numbers" : "Live from YouTube"}
+          {stale ? "Showing cached numbers" : "Live from YouTube"}
           <span className="text-rule-strong">/</span>
           <RelativeTime iso={data.fetchedAt} />
         </p>
@@ -83,21 +94,31 @@ export function ChannelsLive({ initial }: { initial: StatsPayload }) {
         </button>
       </div>
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2">
-        {data.channels.map((c) => (
-          <ChannelCard key={c.handle} channel={c} />
-        ))}
-      </div>
+      {privacy.showPerChannel ? (
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {data.channels.map((c) => (
+            <ChannelCard key={c.id} channel={c} />
+          ))}
+        </div>
+      ) : null}
 
       <p className="mt-8 max-w-2xl text-[13px] leading-relaxed text-ink-muted">
         Subscriber counts are read straight from YouTube, which publishes them rounded to three
-        significant figures. View and video counts are exact. The page refreshes every minute.
+        significant figures. View counts are exact, and the view counter carries on between reads at
+        the rate the channels have been measured moving.
+        {privacy.anonymous ? " Channels are listed without names: they are run facelessly." : ""}
       </p>
+
+      <ProofSection />
     </>
   );
 }
 
 function ChannelCard({ channel: c }: { channel: ChannelStats }) {
+  const label = privacy.anonymous
+    ? `Channel ${String(c.index + 1).padStart(2, "0")}`
+    : (c.name ?? "Channel");
+
   return (
     <article
       className={`rounded-lg border border-rule bg-surface p-5 transition hover:border-rule-strong ${
@@ -105,11 +126,11 @@ function ChannelCard({ channel: c }: { channel: ChannelStats }) {
       }`}
     >
       <div className="flex items-start gap-4">
-        <Avatar src={c.avatar} name={c.name} />
+        <Mark channel={c} />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5">
             <h3 className="font-serif text-lg leading-snug font-semibold tracking-tight text-ink">
-              {c.name}
+              {label}
             </h3>
             {c.flagship ? (
               <span className="rounded-full border border-rule bg-sunk px-2 py-0.5 text-[11px] font-medium text-ink-muted">
@@ -118,24 +139,30 @@ function ChannelCard({ channel: c }: { channel: ChannelStats }) {
             ) : null}
           </div>
           <p className="mt-0.5 text-[13px] text-ink-muted">
-            @{c.handle}
-            <span className="mx-1.5 text-rule-strong">/</span>
+            {privacy.anonymous ? null : (
+              <>
+                @{c.handle}
+                <span className="mx-1.5 text-rule-strong">/</span>
+              </>
+            )}
             {c.niche}
           </p>
         </div>
-        <a
-          href={c.url}
-          target="_blank"
-          rel="noreferrer"
-          className="shrink-0 rounded-full border border-rule px-3 py-1.5 text-[12px] font-medium text-ink-soft transition hover:border-rule-strong hover:text-ink"
-        >
-          Visit
-        </a>
+        {privacy.anonymous ? null : (
+          <a
+            href={c.url}
+            target="_blank"
+            rel="noreferrer"
+            className="shrink-0 rounded-full border border-rule px-3 py-1.5 text-[12px] font-medium text-ink-soft transition hover:border-rule-strong hover:text-ink"
+          >
+            Visit
+          </a>
+        )}
       </div>
 
       <dl className="mt-5 grid grid-cols-3 gap-4 border-t border-rule pt-4">
         <Stat label="Subscribers" value={c.subscribers} />
-        <Stat label="Views" value={c.views} />
+        <Stat label="Views" value={c.views} perSecond={c.viewsPerSecond} since={c.viewsAt} />
         <Stat label="Videos" value={c.videos} />
       </dl>
 
@@ -148,34 +175,24 @@ function ChannelCard({ channel: c }: { channel: ChannelStats }) {
   );
 }
 
-function Total({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="bg-surface px-6 py-7">
-      <p className="eyebrow">{label}</p>
-      <p className="mt-2 font-serif text-[clamp(1.9rem,4.5vw,2.6rem)] leading-none font-semibold tracking-tight text-ink">
-        <CountUp value={value} />
-      </p>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <div>
-      <dt className="eyebrow">{label}</dt>
-      <dd className="tnum mt-1 font-serif text-[17px] font-semibold text-ink">
-        <CountUp value={value} />
-      </dd>
-    </div>
-  );
-}
-
-function Avatar({ src, name }: { src: string | null; name: string }) {
+/**
+ * The card's leading mark. An avatar names the channel as surely as its title
+ * does, so while `privacy.anonymous` is on this is just the ordinal.
+ */
+function Mark({ channel: c }: { channel: ChannelStats }) {
   const [failed, setFailed] = useState(false);
-  if (!src || failed) {
+
+  if (privacy.anonymous) {
+    return (
+      <div className="tnum grid size-11 shrink-0 place-items-center rounded-full border border-rule bg-sunk font-serif text-[15px] font-semibold text-ink-muted">
+        {String(c.index + 1).padStart(2, "0")}
+      </div>
+    );
+  }
+  if (!c.avatar || failed) {
     return (
       <div className="grid size-11 shrink-0 place-items-center rounded-full border border-rule bg-sunk font-serif text-[15px] font-semibold text-ink-muted">
-        {name.charAt(0)}
+        {c.name?.charAt(0) ?? "?"}
       </div>
     );
   }
@@ -184,7 +201,7 @@ function Avatar({ src, name }: { src: string | null; name: string }) {
     // and rotates them, so there is nothing stable to cache on our side.
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={src}
+      src={c.avatar}
       alt=""
       width={44}
       height={44}
@@ -192,6 +209,84 @@ function Avatar({ src, name }: { src: string | null; name: string }) {
       onError={() => setFailed(true)}
       className="size-11 shrink-0 rounded-full border border-rule object-cover"
     />
+  );
+}
+
+function ProofSection() {
+  return (
+    <section className="mt-16 border-t border-rule pt-10">
+      <p className="eyebrow">Receipts</p>
+      <h2 className="mt-2 font-serif text-2xl leading-tight font-semibold tracking-tight text-ink">
+        Peak 48 hour windows
+      </h2>
+      <p className="mt-3 max-w-2xl text-[15px] leading-[1.7] text-ink-soft">
+        Straight from YouTube Studio on days the network was running hot. Cropped above the video
+        list, so these show the totals and the shape of the traffic and nothing else.
+      </p>
+
+      <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {proofShots.map((shot) => (
+          <figure key={shot.src} className="overflow-hidden rounded-lg border border-rule bg-black">
+            <Image
+              src={shot.src}
+              alt={shot.alt}
+              width={1170}
+              height={1222}
+              className="h-auto w-full"
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            />
+            <figcaption className="border-t border-rule bg-surface px-4 py-3">
+              <p className="tnum font-serif text-[17px] font-semibold text-ink">
+                {nf.format(shot.views)}
+              </p>
+              <p className="eyebrow mt-0.5">views in 48 hours</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Total({
+  label,
+  value,
+  perSecond,
+  since,
+}: {
+  label: string;
+  value: number;
+  perSecond?: number;
+  since?: string;
+}) {
+  return (
+    <div className="bg-surface px-6 py-7">
+      <p className="eyebrow">{label}</p>
+      <p className="mt-2 font-serif text-[clamp(1.9rem,4.5vw,2.6rem)] leading-none font-semibold tracking-tight text-ink">
+        <CountUp value={value} perSecond={perSecond} since={since} />
+      </p>
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  perSecond,
+  since,
+}: {
+  label: string;
+  value: number;
+  perSecond?: number;
+  since?: string;
+}) {
+  return (
+    <div>
+      <dt className="eyebrow">{label}</dt>
+      <dd className="tnum mt-1 font-serif text-[17px] font-semibold text-ink">
+        <CountUp value={value} perSecond={perSecond} since={since} />
+      </dd>
+    </div>
   );
 }
 

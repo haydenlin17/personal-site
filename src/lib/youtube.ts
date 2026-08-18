@@ -1,5 +1,9 @@
 import { unstable_cache } from "next/cache";
-import { channels, type Channel } from "./channels";
+import { channels, privacy, type Channel } from "./channels";
+import { loadState, saveState, type StoredState } from "./stats-store";
+import type { ChannelSample, ChannelStats, StatsPayload, StatSource } from "./youtube-types";
+
+export type { ChannelStats, StatsPayload, StatSource } from "./youtube-types";
 
 /**
  * Reading the eight channels, in order of preference:
@@ -17,28 +21,26 @@ import { channels, type Channel } from "./channels";
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
 
-export type StatSource = "api" | "scrape" | "cached";
+/**
+ * YouTube publishes channel view totals in lumps hours apart, so a rate is only
+ * trusted once the two readings behind it sit far enough apart that several
+ * lumps have landed. Below this the number measures YouTube's publishing
+ * schedule rather than the channel.
+ */
+const MIN_RATE_WINDOW_S = 3 * 60 * 60;
 
-export type ChannelStats = {
-  handle: string;
-  name: string;
-  niche: string;
-  flagship: boolean;
-  url: string;
-  subscribers: number;
-  views: number;
-  videos: number;
-  avatar: string | null;
-  source: StatSource;
-};
+/**
+ * Absolute ceiling, for legibility rather than correctness: past a few hundred
+ * a second the digits blur into noise. No channel here comes close.
+ */
+const MAX_RATE = 500;
 
-export type StatsPayload = {
-  channels: ChannelStats[];
-  totals: { subscribers: number; views: number; videos: number };
-  fetchedAt: string;
-  /** True when every channel fell all the way back to its baseline. */
-  degraded: boolean;
-};
+/**
+ * How much of a newly measured rate is taken on board at each refresh. Lumps
+ * arrive unevenly, so a single wide gap should nudge the rate rather than
+ * redefine it.
+ */
+const SMOOTHING = 0.5;
 
 async function get(url: string, headers: Record<string, string> = {}, ms = 9000) {
   const ctl = new AbortController();
@@ -128,24 +130,101 @@ async function readViaScrape(handle: string): Promise<Read | null> {
   }
 }
 
-function toStats(channel: Channel, read: Read | null, source: StatSource): ChannelStats {
+/** The one rate that needs no history and cannot be thrown off by lumpy publishing. */
+function lifetimeRate(channel: Channel, views: number): number {
+  const age = Math.max(1, (Date.now() - Date.parse(channel.startedAt)) / 1000);
+  return views / age;
+}
+
+/**
+ * Advances a channel's view history and returns the rate to display with it.
+ *
+ * `at` is when a total became true, not when it was last confirmed: an
+ * unchanged reading keeps the timestamp it arrived with. Stamping every
+ * successful poll would make the window one poll interval wide while the delta
+ * covered hours, which is how a counter ends up climbing at forty a second.
+ */
+function advance(
+  channel: Channel,
+  views: number,
+  prev: ChannelSample | undefined,
+  nowIso: string,
+): { sample: ChannelSample; rate: number } {
+  const seed = lifetimeRate(channel, views);
+
+  if (!prev) {
+    return { sample: { views, at: nowIso, rate: seed, seeded: true }, rate: seed };
+  }
+
+  const changed = prev.views !== views;
+  const sample: ChannelSample = changed
+    ? {
+        views,
+        at: nowIso,
+        prevViews: prev.views,
+        prevAt: prev.at,
+        rate: prev.rate,
+        seeded: prev.seeded,
+      }
+    : { ...prev };
+
+  let rate = sample.rate ?? seed;
+  let seeded = sample.seeded ?? true;
+
+  if (sample.prevViews !== undefined && sample.prevAt) {
+    const dv = sample.views - sample.prevViews;
+    const dt = (Date.parse(sample.at) - Date.parse(sample.prevAt)) / 1000;
+    if (dt > MIN_RATE_WINDOW_S && dv > 0) {
+      const measured = dv / dt;
+      // A lifetime average is replaced outright: it describes the channel's
+      // whole history, which for a channel that scaled recently is not the
+      // channel it is now. Later measurements only nudge, so one unusually
+      // wide gap cannot redefine the rate.
+      rate = seeded ? measured : rate * (1 - SMOOTHING) + measured * SMOOTHING;
+      seeded = false;
+    }
+  }
+
+  rate = Math.min(MAX_RATE, Math.max(0, rate));
+  return { sample: { ...sample, rate, seeded }, rate };
+}
+
+/**
+ * Builds the object that is serialised into the page and served from
+ * /api/channels. While `privacy.anonymous` is on, the name, handle, URL and
+ * avatar are left out here rather than hidden in the components: a field that
+ * reaches the payload is public whether or not anything renders it.
+ */
+function toStats(
+  channel: Channel,
+  index: number,
+  read: Read | null,
+  source: StatSource,
+): Omit<ChannelStats, "viewsPerSecond" | "viewsAt"> {
   const value = read ?? { ...channel.baseline, avatar: null };
-  return {
-    handle: channel.handle,
-    name: channel.name,
+  const base = {
+    id: `c${index + 1}`,
+    index,
     niche: channel.niche,
     flagship: channel.flagship ?? false,
-    url: `https://www.youtube.com/@${channel.handle}`,
     subscribers: value.subscribers,
     views: value.views,
     videos: value.videos,
+    source: read ? source : ("cached" as StatSource),
+  };
+  if (privacy.anonymous) return base;
+  return {
+    ...base,
+    handle: channel.handle,
+    name: channel.name,
+    url: `https://www.youtube.com/@${channel.handle}`,
     avatar: value.avatar,
-    source: read ? source : "cached",
   };
 }
 
 async function readAll(): Promise<StatsPayload> {
   const key = process.env.YOUTUBE_API_KEY;
+  const nowIso = new Date().toISOString();
 
   let fromApi: Map<string, Read> | null = null;
   if (key) {
@@ -156,27 +235,47 @@ async function readAll(): Promise<StatsPayload> {
     }
   }
 
-  const results = await Promise.all(
-    channels.map(async (channel) => {
+  const prev = await loadState();
+
+  const base = await Promise.all(
+    channels.map(async (channel, i) => {
       const api = fromApi?.get(channel.id);
-      if (api) return toStats(channel, api, "api");
-      return toStats(channel, await readViaScrape(channel.handle), "scrape");
+      if (api) return toStats(channel, i, api, "api");
+      return toStats(channel, i, await readViaScrape(channel.handle), "scrape");
     }),
   );
+
+  const samples: StoredState["samples"] = {};
+  const results: ChannelStats[] = base.map((stats, i) => {
+    const channel = channels[i];
+    const { sample, rate } = advance(channel, stats.views, prev?.samples?.[stats.id], nowIso);
+    samples[stats.id] = sample;
+    // A cached read is a guess, so it gets no rate: better a still number than
+    // one drifting away from a total that was never confirmed.
+    const live = stats.source !== "cached";
+    return {
+      ...stats,
+      viewsPerSecond: live ? rate : 0,
+      viewsAt: sample.at,
+    };
+  });
+
+  await saveState({ samples });
 
   const totals = results.reduce(
     (acc, c) => ({
       subscribers: acc.subscribers + c.subscribers,
       views: acc.views + c.views,
       videos: acc.videos + c.videos,
+      viewsPerSecond: acc.viewsPerSecond + c.viewsPerSecond,
     }),
-    { subscribers: 0, views: 0, videos: 0 },
+    { subscribers: 0, views: 0, videos: 0, viewsPerSecond: 0 },
   );
 
   return {
     channels: results,
     totals,
-    fetchedAt: new Date().toISOString(),
+    fetchedAt: nowIso,
     degraded: results.every((c) => c.source === "cached"),
   };
 }
@@ -184,9 +283,13 @@ async function readAll(): Promise<StatsPayload> {
 /**
  * Eight page reads take a second or two, so the result is held for ten minutes
  * and shared by every visitor. Only the compact JSON is stored, never the HTML
- * it was parsed out of.
+ * it was parsed out of. The client keeps the view counters moving in between
+ * using `viewsPerSecond`, so a warm cache still reads as live.
  */
-export const getStats = unstable_cache(readAll, ["youtube-channel-stats"], {
+// The key carries a version: the payload shape changed when the live rate was
+// added, and a cache entry written by an older deploy would otherwise be served
+// to a page that now expects viewsPerSecond on every channel.
+export const getStats = unstable_cache(readAll, ["youtube-channel-stats-v2"], {
   revalidate: 600,
   tags: ["channels"],
 });

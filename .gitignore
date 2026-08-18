@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Original unredacted analytics screenshots. The cropped copies in
+# public/proof are the ones the site serves.
+/youtube stats
