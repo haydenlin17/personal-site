@@ -31,6 +31,17 @@ export const quickFacts = [
   { label: "GPA", value: "3.96" },
 ] as const;
 
+/**
+ * The scale numbers, kept separate from `quickFacts` because they answer a
+ * different question: those say who he is on paper, these say what he has run.
+ */
+export const trackRecord = [
+  { value: "120M", label: "Peak monthly views" },
+  { value: "540M+", label: "Lifetime views" },
+  { value: "11", label: "Paid editors led" },
+  { value: "2,000", label: "Discord community" },
+] as const;
+
 export const about = {
   heading: "Who I am",
   paragraphs: [
@@ -56,9 +67,9 @@ export const experience: Experience[] = [
     location: "Millburn, NJ",
     period: "November 2024 to Present",
     bullets: [
-      "Generated a 30% realized, net of commission YTD return in 2026 on a $10K independently managed account through rules based equity options swing trades and disciplined exits.",
-      "Trade futures in prop firm evaluations using volume profile, footprint charts, delta, and order flow signals while maintaining a detailed journal of entries, exits, and execution errors.",
-      "Built a multi timeframe futures order flow engine that processed 235M ticks across 213 trading days, then backtested it to a 64% win rate and a 1.84 profit factor.",
+      "Generated a 30% realized, net of commission YTD return in 2026 on a $10K independently managed account across roughly 100 trades, against a $2K maximum drawdown.",
+      "Trade equity options primarily in mega cap technology, and ES and NQ futures in prop firm evaluations, using volume profile, footprint charts, delta, and order flow signals.",
+      "Keep a detailed journal of entries, exits, and execution errors, and size positions off a fixed risk budget rather than conviction.",
     ],
   },
   {
@@ -71,6 +82,8 @@ export const experience: Experience[] = [
       "Maintain seven active channels and direct production of roughly 150 short form videos per month through standardized scripting, editing, quality control, and publishing workflows.",
       "Lead 11 paid editors and approximately 15 total team members past and present, overseeing hiring, training, performance reviews, workload allocation, and production deadlines.",
       "Generated five figure revenue and built a 2,000 member Discord community by applying retention analytics, creator partnerships, and channel level performance data to growth decisions.",
+      "Extended the flagship channel into a multi platform distribution pipeline that repurposes short form output to TikTok, Instagram, and Facebook, adding roughly 5M incremental views.",
+      "Designed and shipped a channel website with live multi platform statistics, built to give sponsors a single place to see reach.",
     ],
   },
   {
@@ -104,11 +117,14 @@ export const projects: Project[] = [
     kind: "Equity Research",
     period: "April 2026",
     summary:
-      "An independent long pitch delivered through the Rutgers Road to Wall Street program, built from FY2023 to FY2025 filings and investor materials.",
+      "An independent long pitch prepared for the Rutgers Road to Wall Street interview, built from FY2023 to FY2025 filings and investor materials.",
+    href: "/work/life-time",
+    hrefLabel: "Read the full memo",
     bullets: [
       "Identified 14.5% revenue growth to $3.00B, 139% net income growth to $374M, and margin expansion from 6% to 12%.",
       "Developed a long thesis around premium member pricing power, recurring revenue, rising revenue per member, and continued expansion into affluent suburban markets.",
-      "Delivered a verbal pitch covering thesis, valuation, catalysts, competitive positioning, and macro risk, highlighting a 16.8x trailing P/E, a $500M repurchase authorization, roughly 15% insider ownership, and 12 to 14 planned annual club openings.",
+      "Argued the discount against Planet Fitness, which trades near 28x earnings on half the revenue and slower earnings growth, and sized the gap at roughly 25% upside on a 22x multiple.",
+      "Covered catalysts, competitive positioning, and macro risk, including a 16.8x trailing P/E, a $500M repurchase authorization, roughly 15% insider ownership, and 12 to 14 planned annual club openings.",
     ],
     metrics: [
       { label: "Revenue", value: "$3.00B" },
@@ -121,16 +137,17 @@ export const projects: Project[] = [
     kind: "Quantitative Research",
     period: "2026",
     summary:
-      "A multi timeframe order flow engine built with Claude Code to test whether a discretionary futures model holds up against a decade of tick data.",
+      "A multi timeframe order flow engine built to test whether a discretionary futures model survived contact with tick data, and the decision to shelve it when forward testing disagreed with the backtest.",
     bullets: [
       "Processed 235M ticks across 213 trading days and 240 plus focused market hours, identifying 620 valid setups.",
-      "Backtested 89 simulated trades with a 64% win rate, a 1.84 profit factor, and a 1.8R average winner.",
-      "Encoded volume profile, footprint, and delta signals into reproducible rules so results can be re-run rather than remembered.",
+      "Backtested 89 simulated trades to a 64% win rate, a 1.84 profit factor, and a 1.8R average winner, a sample small enough that the error bars are wide.",
+      "Forward tested the same rules on out of sample data, where the edge did not hold, and shelved the automation rather than trade a model the live results did not support.",
+      "Kept what survived: the volume profile, footprint, and delta work now informs discretionary execution instead of an automated system.",
     ],
     metrics: [
       { label: "Ticks processed", value: "235M" },
-      { label: "Win rate", value: "64%" },
-      { label: "Profit factor", value: "1.84" },
+      { label: "Backtest win rate", value: "64%" },
+      { label: "Forward test", value: "Did not hold" },
     ],
   },
   {
@@ -139,6 +156,8 @@ export const projects: Project[] = [
     period: "June 2026 to Present",
     summary:
       "A closed beta fitness application that puts calorie and macro logging, workout planning, workout tracking, and weight tracking in one product.",
+    href: "https://forgegains.vercel.app",
+    hrefLabel: "forgegains.vercel.app",
     bullets: [
       "Built and deployed across approximately 20 synced accounts, with diet, workout, and weight data centralized for ongoing tracking.",
       "Engineered Gemini API powered meal logging that processed approximately 500 food entries, roughly 70% of them submitted through photo based tracking rather than natural language or manual entry.",
@@ -170,6 +189,16 @@ export const education = {
   involvement: ["Little Investment Bankers at Rutgers", "Ascend New Brunswick"],
   priorSchool: { name: "Millburn High School", period: "2021 to 2025" },
 } as const;
+
+/**
+ * Roles are stated plainly. "Member" is what these were, and a reader who has
+ * sat on the other side of a resume screen can tell the difference between a
+ * member and a chair anyway.
+ */
+export const involvement = [
+  { org: "Little Investment Bankers at Rutgers", role: "Member", period: "2025 to Present" },
+  { org: "Ascend New Brunswick", role: "Member", period: "2025 to Present" },
+] as const;
 
 export const skillGroups = [
   {
@@ -215,13 +244,11 @@ export const skillGroups = [
     title: "Growth and Operations",
     items: [
       "Growth Strategy",
-      "YouTube Analytics",
       "Content Operations",
-      "Digital Marketing",
+      "Team Leadership",
+      "Hiring and Training",
       "Community Management",
-      "Buffer Automation",
-      "CapCut",
-      "DaVinci Resolve",
+      "Performance Analytics",
     ],
   },
 ] as const;
@@ -233,8 +260,20 @@ export const platforms = [
   "MotiveWave",
   "TradingView",
   "Excel",
+] as const;
+
+/**
+ * The production side of the toolkit. Shown on the channels tab rather than the
+ * profile: a recruiter reading for markets work does not need to know which
+ * editor cuts the videos, and it dilutes the page when it sits next to Bloomberg.
+ */
+export const productionTools = [
   "YouTube Studio",
+  "CapCut",
+  "DaVinci Resolve",
+  "Buffer",
   "Higgsfield",
+  "Retention Analytics",
 ] as const;
 
 export const credentials = [

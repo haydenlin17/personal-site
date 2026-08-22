@@ -1,3 +1,6 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+import Image from "next/image";
 import { Section } from "@/components/section";
 import {
   about,
@@ -8,10 +11,15 @@ import {
   languages,
   person,
   platforms,
+  involvement,
   projects,
   quickFacts,
   skillGroups,
+  trackRecord,
 } from "@/lib/content";
+
+/** Drop a square portrait here and it appears; leave it out and the hero adapts. */
+const PORTRAIT = "headshot.jpg";
 
 export default function ProfilePage() {
   return (
@@ -94,6 +102,26 @@ export default function ProfilePage() {
                   </li>
                 ))}
               </ul>
+              {p.href ? (
+                <a
+                  href={p.href}
+                  target={p.href.startsWith("http") ? "_blank" : undefined}
+                  rel={p.href.startsWith("http") ? "noreferrer" : undefined}
+                  className="group mt-5 inline-flex items-center gap-1.5 text-[14px] font-medium text-accent transition hover:text-accent-soft"
+                >
+                  {p.hrefLabel ?? "Open"}
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-3.5 transition group-hover:translate-x-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </a>
+              ) : null}
               {p.metrics ? (
                 <dl className="mt-6 grid grid-cols-1 gap-4 border-t border-rule pt-5 sm:grid-cols-3">
                   {p.metrics.map((m) => (
@@ -122,7 +150,7 @@ export default function ProfilePage() {
           <p className="mt-1.5 text-[14px] font-medium text-accent">{education.degree}</p>
           <p className="mt-0.5 text-[13px] text-ink-muted">{education.location}</p>
 
-          <dl className="mt-6 grid grid-cols-1 gap-5 border-t border-rule pt-5 sm:grid-cols-2">
+          <dl className="mt-6 grid grid-cols-1 gap-5 border-t border-rule pt-5 sm:grid-cols-3">
             <div>
               <dt className="eyebrow">Standing</dt>
               <dd className="mt-1 text-[15px] text-ink-soft">{education.standing}</dd>
@@ -137,21 +165,31 @@ export default function ProfilePage() {
                 {education.coursework.join(", ")}
               </dd>
             </div>
-            <div>
-              <dt className="eyebrow">Involvement</dt>
-              <dd className="mt-1 text-[15px] leading-relaxed text-ink-soft">
-                {education.involvement.join(", ")}
-              </dd>
-            </div>
           </dl>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 rounded-lg border border-rule px-6 py-4">
-          <p className="font-serif text-[15px] font-semibold text-ink">
-            {education.priorSchool.name}
-          </p>
-          <p className="tnum text-[13px] text-ink-muted">{education.priorSchool.period}</p>
-        </div>
+        <ul className="mt-4 space-y-3">
+          {involvement.map((club) => (
+            <li
+              key={club.org}
+              className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 rounded-lg border border-rule px-6 py-4"
+            >
+              <span className="font-serif text-[15px] font-semibold text-ink">
+                {club.org}
+                <span className="ml-2.5 font-sans text-[13px] font-normal text-ink-muted">
+                  {club.role}
+                </span>
+              </span>
+              <span className="tnum text-[13px] text-ink-muted">{club.period}</span>
+            </li>
+          ))}
+          <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 rounded-lg border border-rule px-6 py-4">
+            <span className="font-serif text-[15px] font-semibold text-ink">
+              {education.priorSchool.name}
+            </span>
+            <span className="tnum text-[13px] text-ink-muted">{education.priorSchool.period}</span>
+          </li>
+        </ul>
       </Section>
 
       <Section id="skills" label="Skills" title="Tools and capabilities">
@@ -186,54 +224,82 @@ export default function ProfilePage() {
 }
 
 function Hero() {
+  // Checked at build time so the layout simply has no portrait column until the
+  // file is dropped in, rather than shipping a broken image in the meantime.
+  const portrait = existsSync(join(process.cwd(), "public", PORTRAIT)) ? `/${PORTRAIT}` : null;
+
   return (
     <section className="mx-auto max-w-6xl px-5 pt-14 pb-12 sm:px-8 sm:pt-24 sm:pb-16">
-      <p className="eyebrow rise">{person.role}</p>
-      <h1
-        className="rise mt-4 font-serif text-[clamp(2.75rem,9vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-ink"
-        style={{ animationDelay: "60ms" }}
-      >
-        {person.name}
-      </h1>
-      <p
-        className="rise mt-6 max-w-2xl text-[17px] leading-[1.7] text-ink-soft"
-        style={{ animationDelay: "120ms" }}
-      >
-        {person.intro}
-      </p>
-      <div
-        className="rise mt-9 grid gap-3 sm:grid-cols-2 lg:max-w-4xl lg:grid-cols-3"
-        style={{ animationDelay: "180ms" }}
-      >
-        <ActionCard
-          href={person.resume}
-          download="Hayden-Lin-Resume.pdf"
-          title="Download resume"
-          detail="PDF, one page, 120 KB"
-          icon={<DownloadIcon />}
-        />
-        <ActionCard
-          href={`mailto:${person.email}`}
-          title="Send me an email"
-          detail={person.email}
-          icon={<MailIcon />}
-        />
-        <ActionCard
-          href={person.linkedin}
-          external
-          title="Connect on LinkedIn"
-          detail={person.linkedinLabel}
-          icon={<LinkedInIcon />}
-        />
+      <div className="flex flex-col-reverse gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-14">
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow rise">{person.role}</p>
+          <h1
+            className="rise mt-4 font-serif text-[clamp(2.75rem,9vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-ink"
+            style={{ animationDelay: "60ms" }}
+          >
+            {person.name}
+          </h1>
+          <p
+            className="rise mt-6 max-w-2xl text-[17px] leading-[1.7] text-ink-soft"
+            style={{ animationDelay: "120ms" }}
+          >
+            {person.intro}
+          </p>
+          <div className="rise mt-8 flex flex-wrap gap-3" style={{ animationDelay: "180ms" }}>
+            <ActionButton
+              href={person.resume}
+              download="Hayden-Lin-Resume.pdf"
+              icon={<DocumentIcon />}
+            >
+              Resume
+            </ActionButton>
+            <ActionButton href={`mailto:${person.email}`} icon={<MailIcon />}>
+              Contact
+            </ActionButton>
+            <ActionButton href={person.linkedin} external icon={<LinkedInIcon />}>
+              LinkedIn
+            </ActionButton>
+          </div>
+        </div>
+
+        {portrait ? (
+          <div className="rise shrink-0" style={{ animationDelay: "120ms" }}>
+            <Image
+              src={portrait}
+              alt={`${person.name}, portrait`}
+              width={220}
+              height={220}
+              priority
+              className="size-32 rounded-lg border border-rule object-cover sm:size-40 lg:size-[220px]"
+            />
+          </div>
+        ) : null}
       </div>
 
-      <dl className="rise mt-14 grid grid-cols-2 border-t border-rule sm:grid-cols-4" style={{ animationDelay: "240ms" }}>
+      <dl
+        className="rise mt-14 grid grid-cols-2 border-t border-rule sm:grid-cols-4"
+        style={{ animationDelay: "240ms" }}
+      >
         {quickFacts.map((fact) => (
           <div key={fact.label} className="border-b border-rule py-5 pr-6 sm:border-b-0">
             <dt className="eyebrow">{fact.label}</dt>
             <dd className="mt-1.5 font-serif text-[17px] leading-snug font-semibold text-ink">
               {fact.value}
             </dd>
+          </div>
+        ))}
+      </dl>
+
+      <dl
+        className="rise grid grid-cols-2 border-t border-rule sm:grid-cols-4"
+        style={{ animationDelay: "300ms" }}
+      >
+        {trackRecord.map((stat) => (
+          <div key={stat.label} className="border-b border-rule py-5 pr-6 sm:border-b-0">
+            <dd className="tnum font-serif text-[clamp(1.5rem,3.5vw,2rem)] leading-none font-semibold tracking-tight text-ink">
+              {stat.value}
+            </dd>
+            <dt className="eyebrow mt-2">{stat.label}</dt>
           </div>
         ))}
       </dl>
@@ -259,22 +325,15 @@ function ListBlock({ title, items }: { title: string; items: string[] }) {
   );
 }
 
-/**
- * The two things a visitor is most likely to want, said plainly. A pill reading
- * "Resume" leaves them guessing whether it opens, downloads, or scrolls; this
- * says which, and what they are getting.
- */
-function ActionCard({
+function ActionButton({
   href,
-  title,
-  detail,
+  children,
   icon,
   download,
   external,
 }: {
   href: string;
-  title: string;
-  detail: string;
+  children: React.ReactNode;
   icon: React.ReactNode;
   download?: string;
   external?: boolean;
@@ -285,30 +344,15 @@ function ActionCard({
       download={download}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
-      className="group flex items-center gap-4 rounded-lg border border-rule bg-surface px-4 py-4 transition hover:border-accent hover:bg-sunk"
+      className="inline-flex items-center gap-2.5 rounded-lg border border-rule-strong px-5 py-3 text-[15px] font-medium text-ink transition hover:border-accent hover:bg-sunk"
     >
-      <span className="grid size-10 shrink-0 place-items-center rounded-full border border-rule bg-paper text-accent transition group-hover:border-accent">
-        {icon}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-[15px] font-semibold text-ink">{title}</span>
-        <span className="mt-0.5 block truncate text-[13px] text-ink-muted">{detail}</span>
-      </span>
-      <svg
-        viewBox="0 0 24 24"
-        className="size-4 shrink-0 text-ink-muted transition group-hover:translate-x-0.5 group-hover:text-accent"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        aria-hidden
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
-      </svg>
+      <span className="text-ink-muted transition group-hover:text-accent">{icon}</span>
+      {children}
     </a>
   );
 }
 
-function DownloadIcon() {
+function DocumentIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -318,8 +362,8 @@ function DownloadIcon() {
       strokeWidth="1.7"
       aria-hidden
     >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v11m0 0 4-4m-4 4-4-4" />
-      <path strokeLinecap="round" d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5M9 13h6M9 17h4" />
     </svg>
   );
 }

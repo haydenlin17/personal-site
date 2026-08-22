@@ -20,18 +20,23 @@
   --accent-wash: #eef1f6;
 }
 
+/*
+ * Neutral black, not the warm near-black the light theme's paper would suggest.
+ * The greys are deliberately hue-free so nothing reads as brown next to the
+ * blue accent.
+ */
 .dark {
-  --paper: #131210;
-  --surface: #1a1917;
-  --surface-sunk: #201e1b;
-  --ink: #ece8e0;
-  --ink-soft: #c4beb2;
-  --ink-muted: #918b80;
-  --rule: #2d2a25;
-  --rule-strong: #423d36;
+  --paper: #0a0a0a;
+  --surface: #141414;
+  --surface-sunk: #1b1b1b;
+  --ink: #ededed;
+  --ink-soft: #c3c3c3;
+  --ink-muted: #8b8b8b;
+  --rule: #262626;
+  --rule-strong: #3d3d3d;
   --accent: #a9c4e8;
   --accent-soft: #c3d6f0;
-  --accent-wash: #1c2432;
+  --accent-wash: #1a2230;
 }
 
 @theme inline {
@@ -54,8 +59,9 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Clears the sticky header when an anchor link lands on a section. */
-    scroll-padding-top: 6rem;
+    /* Clears the sticky header when an anchor link lands on a section. Below lg
+       the header carries a second row of section links, so it needs more. */
+    scroll-padding-top: 7.5rem;
   }
 
   body {
@@ -93,6 +99,15 @@
 }
 
 @layer components {
+  /* The section rail scrolls; a visible scrollbar under it just adds noise. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   /* The small uppercase label that opens every section and card group. */
   .eyebrow {
     font-size: 0.6875rem;
@@ -124,3 +139,53 @@
   animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+
+/*
+ * Recruiters print portfolio pages and save them as PDFs. Without this the page
+ * prints whatever theme happened to be on screen, chrome and all.
+ */
+@media print {
+  :root {
+    --paper: #ffffff;
+    --surface: #ffffff;
+    --surface-sunk: #ffffff;
+    --ink: #000000;
+    --ink-soft: #1a1a1a;
+    --ink-muted: #4a4a4a;
+    --rule: #cccccc;
+    --rule-strong: #999999;
+    --accent: #1f3a5f;
+  }
+
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Sections are self contained, so let them break cleanly rather than mid card. */
+  section,
+  article {
+    break-inside: avoid-page;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  /* A printed link is useless without its destination. */
+  main a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    color: #4a4a4a;
+  }
+
+  .rise {
+    animation: none !important;
+  }
+}

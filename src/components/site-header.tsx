@@ -76,6 +76,28 @@ export function SiteHeader() {
           <ThemeToggle />
         </div>
       </div>
+
+      {/* Below lg the section links move to their own scrollable row, because a
+          phone is where most of these links get opened and there was no way to
+          jump between sections there at all. */}
+      {onProfile ? (
+        <nav
+          aria-label="Sections"
+          className="scrollbar-none flex gap-5 overflow-x-auto border-t border-rule px-5 py-2.5 sm:px-8 lg:hidden"
+        >
+          {sections.map((s) => (
+            <a
+              key={s.id}
+              href={`#${s.id}`}
+              className={`shrink-0 text-[13px] whitespace-nowrap transition ${
+                active === s.id ? "text-ink" : "text-ink-muted"
+              }`}
+            >
+              {s.label}
+            </a>
+          ))}
+        </nav>
+      ) : null}
     </header>
   );
 }

@@ -100,26 +100,30 @@ export const channels: Channel[] = [
  * list, which carries video titles and thumbnails; originals are kept out of
  * the repo entirely.
  */
-export type ProofShot = { src: string; views: number; alt: string };
+export type ProofShot = { src: string; views: number; date: string; alt: string };
 
 export const proofShots: ProofShot[] = [
   {
     src: "/proof/peak-d.png",
+    date: "2 July 2026",
     views: 22_672_281,
     alt: "YouTube Studio realtime chart showing 22,672,281 views over 48 hours",
   },
   {
     src: "/proof/peak-b.png",
+    date: "19 March 2026",
     views: 19_005_914,
     alt: "YouTube Studio realtime chart showing 19,005,914 views over 48 hours",
   },
   {
     src: "/proof/peak-c.png",
+    date: "25 March 2026",
     views: 10_093_869,
     alt: "YouTube Studio realtime chart showing 10,093,869 views over 48 hours",
   },
   {
     src: "/proof/peak-a.png",
+    date: "14 December 2025",
     views: 9_477_985,
     alt: "YouTube Studio realtime chart showing 9,477,985 views over 48 hours",
   },

@@ -31,9 +31,9 @@ export default async function ChannelsPage() {
         className="rise mt-5 max-w-2xl text-[17px] leading-[1.7] text-ink-soft"
         style={{ animationDelay: "120ms" }}
       >
-        The {channels.length} channels carrying the network, pulled live from YouTube every time this
-        page loads. What started as one Brawl Stars channel is now a small studio spanning memes,
-        list content, and Roblox.
+        I run seven active channels. The {channels.length} below are the ones that took off, pulled
+        live from YouTube every time this page loads. What started as one Brawl Stars channel is now
+        a small studio spanning memes, list content, and Roblox.
       </p>
 
       <div className="rise mt-12" style={{ animationDelay: "180ms" }}>

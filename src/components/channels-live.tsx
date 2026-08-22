@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { CountUp } from "./count-up";
 import { privacy, proofShots } from "@/lib/channels";
+import { productionTools } from "@/lib/content";
 import type { ChannelStats, StatsPayload } from "@/lib/youtube";
 
 /** How often the page asks again. The endpoint itself is cached for ten minutes. */
@@ -110,6 +111,23 @@ export function ChannelsLive({ initial }: { initial: StatsPayload }) {
       </p>
 
       <ProofSection />
+
+      <section className="mt-14 border-t border-rule pt-10">
+        <p className="eyebrow">Toolkit</p>
+        <h2 className="mt-2 font-serif text-2xl leading-tight font-semibold tracking-tight text-ink">
+          What runs the operation
+        </h2>
+        <ul className="mt-5 flex flex-wrap gap-1.5">
+          {productionTools.map((tool) => (
+            <li
+              key={tool}
+              className="rounded-full border border-rule bg-surface px-3 py-1 text-[13px] text-ink-soft"
+            >
+              {tool}
+            </li>
+          ))}
+        </ul>
+      </section>
     </>
   );
 }
@@ -220,8 +238,9 @@ function ProofSection() {
         Peak 48 hour windows
       </h2>
       <p className="mt-3 max-w-2xl text-[15px] leading-[1.7] text-ink-soft">
-        Straight from YouTube Studio on days the network was running hot. Cropped above the video
-        list, so these show the totals and the shape of the traffic and nothing else.
+        Straight from YouTube Studio on days the network was running hot. These are peaks, not a
+        typical day, which is why each one is dated. Cropped above the video list, so they show the
+        totals and the shape of the traffic and nothing else.
       </p>
 
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -240,6 +259,7 @@ function ProofSection() {
                 {nf.format(shot.views)}
               </p>
               <p className="eyebrow mt-0.5">views in 48 hours</p>
+              <p className="tnum mt-2 text-[12px] text-ink-muted">{shot.date}</p>
             </figcaption>
           </figure>
         ))}
