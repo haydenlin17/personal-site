@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import Image from "next/image";
+import Link from "next/link";
 import { Section } from "@/components/section";
 import {
   about,
@@ -67,6 +68,24 @@ export default function ProfilePage() {
                   </li>
                 ))}
               </ul>
+              {job.href ? (
+                <Link
+                  href={job.href}
+                  className="group mt-5 inline-flex items-center gap-1.5 text-[14px] font-medium text-accent transition hover:text-accent-soft"
+                >
+                  {job.hrefLabel ?? "Open"}
+                  <svg
+                    viewBox="0 0 24 24"
+                    className="size-3.5 transition group-hover:translate-x-0.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    aria-hidden
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+                  </svg>
+                </Link>
+              ) : null}
             </li>
           ))}
         </ol>

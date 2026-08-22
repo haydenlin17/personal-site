@@ -58,6 +58,9 @@ export type Experience = {
   location: string;
   period: string;
   bullets: string[];
+  /** Optional link rendered under the bullets. */
+  href?: string;
+  hrefLabel?: string;
 };
 
 export const experience: Experience[] = [
@@ -85,6 +88,8 @@ export const experience: Experience[] = [
       "Extended the flagship channel into a multi platform distribution pipeline that repurposes short form output to TikTok, Instagram, and Facebook, adding roughly 5M incremental views.",
       "Designed and shipped a channel website with live multi platform statistics, built to give sponsors a single place to see reach.",
     ],
+    href: "/channels",
+    hrefLabel: "See the live channel numbers",
   },
   {
     org: "Rutgers Department of Finance",
@@ -137,17 +142,17 @@ export const projects: Project[] = [
     kind: "Quantitative Research",
     period: "2026",
     summary:
-      "A multi timeframe order flow engine built to test whether a discretionary futures model survived contact with tick data, and the decision to shelve it when forward testing disagreed with the backtest.",
+      "A multi timeframe order flow engine built to put a discretionary futures model through a decade of tick data and see what the numbers said about it.",
     bullets: [
       "Processed 235M ticks across 213 trading days and 240 plus focused market hours, identifying 620 valid setups.",
-      "Backtested 89 simulated trades to a 64% win rate, a 1.84 profit factor, and a 1.8R average winner, a sample small enough that the error bars are wide.",
-      "Forward tested the same rules on out of sample data, where the edge did not hold, and shelved the automation rather than trade a model the live results did not support.",
-      "Kept what survived: the volume profile, footprint, and delta work now informs discretionary execution instead of an automated system.",
+      "Backtested 89 simulated trades across those setups, which returned a 64% win rate, a 1.84 profit factor, and a 1.8R average winner against a fixed risk model.",
+      "Encoded volume profile, footprint, and delta signals into reproducible rules, then forward tested them on out of sample data as a check on the backtest.",
+      "Carried the volume profile, footprint, and delta work into how I read and execute trades discretionarily today.",
     ],
     metrics: [
       { label: "Ticks processed", value: "235M" },
+      { label: "Setups identified", value: "620" },
       { label: "Backtest win rate", value: "64%" },
-      { label: "Forward test", value: "Did not hold" },
     ],
   },
   {
