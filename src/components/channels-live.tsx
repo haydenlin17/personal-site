@@ -277,10 +277,8 @@ function ProofSection() {
         Peak 48 hour windows
       </h2>
       <p className="mt-3 max-w-2xl text-[15px] leading-[1.7] text-ink-soft">
-        Each of these is a two day window from YouTube Studio, the private dashboard behind a
-        channel. The large number is how many times the videos were watched across those 48 hours,
-        and the bars underneath show when those views came in. Cropped above the video list, so they
-        show the totals and the shape of the traffic and nothing else.
+        Total views over 48 hours, taken from YouTube Studio, the private dashboard behind a
+        channel.
       </p>
 
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -298,8 +296,8 @@ function ProofSection() {
               <p className="tnum font-serif text-[17px] font-semibold text-ink">
                 {nf.format(shot.views)}
               </p>
-              <p className="eyebrow mt-0.5">views in 48 hours</p>
-              <p className="tnum mt-2 text-[12px] text-ink-muted">{shot.date}</p>
+              <p className="eyebrow mt-1">views in 48 hours</p>
+              <p className="eyebrow tnum mt-1">{shot.date}</p>
             </figcaption>
           </figure>
         ))}

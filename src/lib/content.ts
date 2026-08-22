@@ -158,11 +158,12 @@ export const projects: Project[] = [
     kind: "Community Economy",
     period: "April 2025 to Present",
     summary:
-      "A points economy running inside the 2,000 member Discord attached to the channels, built on a configurable currency bot rather than one I wrote, and designed around what actually keeps people coming back.",
+      "A virtual economy I designed and operate inside the 2,000 member Discord attached to the channels, built to turn an audience that watches into a community that shows up daily.",
     bullets: [
-      "Designed the earning and spending loop end to end: what commands pay out, what they pay, and what the coins buy, from Discord roles to in game Brawl Stars rewards.",
-      "Drew 1,110 participants and roughly 175,000 messages across the two channels the economy runs in, over more than a year of continuous operation.",
-      "Tuned payouts and prices against participation, treating the reward pool as a budget and the sinks as the lever that keeps the currency worth earning.",
+      "Designed the full earning and spending loop: which actions pay out, what they pay, and what the currency buys, from Discord roles to in game Brawl Stars rewards.",
+      "Grew it to 1,110 participants and roughly 175,000 messages across the two channels it runs in, sustained continuously for more than a year.",
+      "Priced every reward against a fixed budget and tuned the spending sinks so the currency holds its value as supply grows.",
+      "Read participation data to decide what to reprice, what to retire, and what to introduce next.",
     ],
     metrics: [
       { label: "Participants", value: "1,110" },

@@ -127,7 +127,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(18px);
   }
   to {
     opacity: 1;
@@ -141,7 +141,7 @@
  * as the page loading twice.
  */
 main {
-  animation: rise 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: rise 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 

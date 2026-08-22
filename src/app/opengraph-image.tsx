@@ -48,7 +48,7 @@ export default async function Image() {
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div
             style={{
-              fontSize: 22,
+              fontSize: 18,
               letterSpacing: 4,
               textTransform: "uppercase",
               color: "#8b8b8b",
@@ -90,7 +90,16 @@ export default async function Image() {
             </div>
           ))}
           <div style={{ display: "flex", marginLeft: "auto", alignItems: "flex-end" }}>
-            <div style={{ fontSize: 22, color: "#a9c4e8" }}>haydenlin.vercel.app</div>
+            <div
+              style={{
+                fontSize: 18,
+                letterSpacing: 2,
+                textTransform: "uppercase",
+                color: "#a9c4e8",
+              }}
+            >
+              haydenlin.vercel.app
+            </div>
           </div>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import Image from "next/image";
 import Link from "next/link";
+import { ScrollToTop } from "@/components/scroll-to-top";
 import { Section } from "@/components/section";
 import {
   about,
@@ -24,6 +25,7 @@ const PORTRAIT = "headshot.jpg";
 export default function ProfilePage() {
   return (
     <>
+      <ScrollToTop />
       <Hero />
 
       <Section id="about" label="About" title="Who I am">
@@ -44,11 +46,7 @@ export default function ProfilePage() {
       >
         <ol className="space-y-12">
           {experience.map((job) => (
-            <li key={job.org} className="relative border-l border-rule pl-6">
-              <span
-                aria-hidden
-                className="absolute -left-[3.5px] top-[0.55rem] size-[7px] rounded-full bg-rule-strong"
-              />
+            <li key={job.org} className="border-l border-rule pl-6">
               <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
                 <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
                   {job.org}
@@ -199,23 +197,16 @@ export default function ProfilePage() {
           </dl>
         </div>
 
-        <div className="mt-4 rounded-lg border border-rule px-6 py-5">
+        <div className="mt-4 rounded-lg border border-rule bg-surface p-6 sm:p-7">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-            <p className="font-serif text-[15px] font-semibold text-ink">
+            <h3 className="font-serif text-xl font-semibold tracking-tight text-ink">
               {education.priorSchool.name}
-            </p>
+            </h3>
             <p className="tnum text-[13px] text-ink-muted">{education.priorSchool.period}</p>
           </div>
-          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
-            {education.priorSchool.detail.map((item) => (
-              <li
-                key={item}
-                className="relative pl-4 text-[14px] text-ink-soft before:absolute before:top-[0.62em] before:left-0 before:size-1 before:rounded-full before:bg-rule-strong"
-              >
-                {item}
-              </li>
-            ))}
-          </ul>
+          <p className="mt-1.5 text-[14px] font-medium text-accent">
+            {education.priorSchool.detail.join("  ·  ")}
+          </p>
         </div>
       </Section>
 
@@ -257,8 +248,8 @@ function Hero() {
 
   return (
     <section className="mx-auto max-w-6xl px-5 pt-14 pb-12 sm:px-8 sm:pt-24 sm:pb-16">
-      <div className="flex flex-col-reverse gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-14">
-        <div className="min-w-0 flex-1">
+      <div className="flex flex-col-reverse gap-6 lg:flex-row lg:items-start lg:gap-12">
+        <div className="min-w-0 lg:max-w-[38rem]">
           <p className="eyebrow">{person.role}</p>
           <h1
             className="mt-4 font-serif text-[clamp(2.75rem,9vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-ink"
@@ -291,11 +282,10 @@ function Hero() {
           <Image
             src={portrait}
             alt={`${person.name}, portrait`}
-            width={440}
-            height={550}
+            width={504}
+            height={504}
             priority
-            className="w-[112px] shrink-0 rounded-lg border border-rule object-cover object-[50%_28%] sm:w-[132px] lg:w-[208px]"
-            style={{ aspectRatio: "4 / 5" }}
+            className="size-[132px] shrink-0 rounded-lg border border-rule object-cover sm:size-[160px] lg:size-[252px]"
           />
         ) : null}
       </div>

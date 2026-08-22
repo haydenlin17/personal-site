@@ -205,39 +205,24 @@ function advance(
 }
 
 /**
- * Builds the object that is serialised into the page and served from
- * /api/channels. While `privacy.anonymous` is on, the name, handle, URL and
- * avatar are left out here rather than hidden in the components: a field that
- * reaches the payload is public whether or not anything renders it.
+ * What is worth caching: the numbers, and nothing else. Channel names, niches
+ * and ordering are config, and baking them into a ten minute cache meant an edit
+ * to channels.ts did not reach the page until the cache expired.
  */
-function toStats(
-  channel: Channel,
-  index: number,
-  read: Read | null,
-  source: StatSource,
-): Omit<ChannelStats, "viewsPerSecond" | "viewsAt"> {
-  const value = read ?? { ...channel.baseline, avatar: null };
-  const base = {
-    id: `c${index + 1}`,
-    index,
-    niche: channel.niche,
-    flagship: channel.flagship ?? false,
-    subscribers: value.subscribers,
-    views: value.views,
-    videos: value.videos,
-    source: read ? source : ("cached" as StatSource),
-  };
-  if (privacy.anonymous) return base;
-  return {
-    ...base,
-    handle: channel.handle,
-    name: channel.name,
-    url: `https://www.youtube.com/@${channel.handle}`,
-    avatar: value.avatar,
-  };
-}
+type Measured = {
+  id: string;
+  subscribers: number;
+  views: number;
+  videos: number;
+  source: StatSource;
+  viewsPerSecond: number;
+  viewsAt: string;
+  avatar: string | null;
+};
 
-async function readAll(): Promise<StatsPayload> {
+type CachedRead = { measured: Measured[]; fetchedAt: string; degraded: boolean };
+
+async function readAll(): Promise<CachedRead> {
   const key = process.env.YOUTUBE_API_KEY;
   const nowIso = new Date().toISOString();
 
@@ -252,30 +237,102 @@ async function readAll(): Promise<StatsPayload> {
 
   const prev = await loadState();
 
-  const base = await Promise.all(
-    channels.map(async (channel, i) => {
+  const reads = await Promise.all(
+    channels.map(async (channel) => {
       const api = fromApi?.get(channel.id);
-      if (api) return toStats(channel, i, api, "api");
-      return toStats(channel, i, await readViaScrape(channel.handle), "scrape");
+      if (api) return { channel, read: api, source: "api" as StatSource };
+      return {
+        channel,
+        read: await readViaScrape(channel.handle),
+        source: "scrape" as StatSource,
+      };
     }),
   );
 
   const samples: StoredState["samples"] = {};
-  const results: ChannelStats[] = base.map((stats, i) => {
-    const channel = channels[i];
-    const { sample, rate } = advance(channel, stats.views, prev?.samples?.[stats.id], nowIso);
-    samples[stats.id] = sample;
-    // A cached read is a guess, so it gets no rate: better a still number than
-    // one drifting away from a total that was never confirmed.
-    const live = stats.source !== "cached";
+  const measured: Measured[] = reads.map(({ channel, read, source }, i) => {
+    const id = `c${i + 1}`;
+    const value = read ?? { ...channel.baseline, avatar: null };
+    const { sample, rate } = advance(channel, value.views, prev?.samples?.[id], nowIso);
+    samples[id] = sample;
     return {
-      ...stats,
-      viewsPerSecond: live ? rate : 0,
+      id,
+      subscribers: value.subscribers,
+      views: value.views,
+      videos: value.videos,
+      // A cached read is a guess, so it gets no rate: better a still number than
+      // one drifting away from a total that was never confirmed.
+      viewsPerSecond: read ? rate : 0,
       viewsAt: sample.at,
+      source: read ? source : "cached",
+      avatar: value.avatar,
     };
   });
 
   await saveState({ samples });
+
+  return {
+    measured,
+    fetchedAt: nowIso,
+    degraded: measured.every((m) => m.source === "cached"),
+  };
+}
+
+/**
+ * Reading every channel takes a second or two, so the numbers are held for ten
+ * minutes and shared by every visitor. Only the compact JSON is stored, never
+ * the megabyte of HTML it was parsed out of. The client keeps the view counters
+ * moving in between using `viewsPerSecond`, so a warm cache still reads as live.
+ */
+const readCached = unstable_cache(readAll, ["youtube-channel-numbers-v3"], {
+  revalidate: 600,
+  tags: ["channels"],
+});
+
+/**
+ * Joins the cached numbers to the current config on every request, so renaming a
+ * channel or changing a niche shows up immediately.
+ *
+ * While `privacy.anonymous` is on, the identifying fields are dropped here,
+ * before the object exists. A field that reaches the payload is public whether
+ * or not anything renders it.
+ */
+export async function getStats(): Promise<StatsPayload> {
+  const { measured, fetchedAt, degraded } = await readCached();
+  const byId = new Map(measured.map((m) => [m.id, m]));
+
+  const results: ChannelStats[] = channels.map((channel, i) => {
+    const id = `c${i + 1}`;
+    const m = byId.get(id);
+    const numbers = m ?? {
+      ...channel.baseline,
+      viewsPerSecond: 0,
+      viewsAt: fetchedAt,
+      source: "cached" as StatSource,
+      avatar: null,
+    };
+
+    const base: ChannelStats = {
+      id,
+      index: i,
+      niche: channel.niche,
+      flagship: channel.flagship ?? false,
+      subscribers: numbers.subscribers,
+      views: numbers.views,
+      videos: numbers.videos,
+      source: numbers.source,
+      viewsPerSecond: numbers.viewsPerSecond,
+      viewsAt: numbers.viewsAt,
+    };
+    if (privacy.anonymous) return base;
+    return {
+      ...base,
+      handle: channel.handle,
+      name: channel.name,
+      url: `https://www.youtube.com/@${channel.handle}`,
+      avatar: numbers.avatar,
+    };
+  });
 
   const totals = results.reduce(
     (acc, c) => ({
@@ -287,24 +344,5 @@ async function readAll(): Promise<StatsPayload> {
     { subscribers: 0, views: 0, videos: 0, viewsPerSecond: 0 },
   );
 
-  return {
-    channels: results,
-    totals,
-    fetchedAt: nowIso,
-    degraded: results.every((c) => c.source === "cached"),
-  };
+  return { channels: results, totals, fetchedAt, degraded };
 }
-
-/**
- * Eight page reads take a second or two, so the result is held for ten minutes
- * and shared by every visitor. Only the compact JSON is stored, never the HTML
- * it was parsed out of. The client keeps the view counters moving in between
- * using `viewsPerSecond`, so a warm cache still reads as live.
- */
-// The key carries a version: the payload shape changed when the live rate was
-// added, and a cache entry written by an older deploy would otherwise be served
-// to a page that now expects viewsPerSecond on every channel.
-export const getStats = unstable_cache(readAll, ["youtube-channel-stats-v2"], {
-  revalidate: 600,
-  tags: ["channels"],
-});
