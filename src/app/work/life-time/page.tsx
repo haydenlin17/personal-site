@@ -25,7 +25,7 @@ export default function LifeTimeMemo() {
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 12H5M11 18l-6-6 6-6" />
         </svg>
-        Selected work
+        Projects
       </Link>
 
       <header className="mt-8 border-b border-rule pb-8">

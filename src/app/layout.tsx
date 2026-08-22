@@ -53,6 +53,11 @@ export const viewport: Viewport = {
 const themeScript = `
 (function () {
   try {
+    // Going back to the profile should land on the name, not halfway down the
+    // page where the reader happened to be before they opened Channels. The
+    // site is short enough that restoring a scroll position costs more than it
+    // gives, and the router scrolls new navigations to the top anyway.
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     var stored = localStorage.getItem("theme");
     var dark = stored === "dark" || (!stored && matchMedia("(prefers-color-scheme: dark)").matches);
     document.documentElement.classList.toggle("dark", dark);

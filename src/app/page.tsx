@@ -12,7 +12,6 @@ import {
   languages,
   person,
   platforms,
-  involvement,
   projects,
   quickFacts,
   skillGroups,
@@ -94,7 +93,7 @@ export default function ProfilePage() {
       <Section
         id="work"
         label="Work"
-        title="Selected work"
+        title="Projects"
         lead="Research, systems, and products built end to end."
       >
         <div className="space-y-5">
@@ -169,7 +168,7 @@ export default function ProfilePage() {
           <p className="mt-1.5 text-[14px] font-medium text-accent">{education.degree}</p>
           <p className="mt-0.5 text-[13px] text-ink-muted">{education.location}</p>
 
-          <dl className="mt-6 grid grid-cols-1 gap-5 border-t border-rule pt-5 sm:grid-cols-3">
+          <dl className="mt-6 grid grid-cols-1 gap-x-10 gap-y-5 border-t border-rule pt-5 sm:grid-cols-2">
             <div>
               <dt className="eyebrow">Standing</dt>
               <dd className="mt-1 text-[15px] text-ink-soft">{education.standing}</dd>
@@ -178,37 +177,46 @@ export default function ProfilePage() {
               <dt className="eyebrow">GPA</dt>
               <dd className="tnum mt-1 text-[15px] text-ink-soft">{education.gpa}</dd>
             </div>
-            <div>
+            <div className="sm:col-span-2">
               <dt className="eyebrow">Coursework</dt>
               <dd className="mt-1 text-[15px] leading-relaxed text-ink-soft">
                 {education.coursework.join(", ")}
               </dd>
             </div>
+            <div className="sm:col-span-2">
+              <dt className="eyebrow">Involvement</dt>
+              <dd className="mt-2">
+                <ul className="flex flex-col gap-1.5">
+                  {education.involvement.map((club) => (
+                    <li key={club.org} className="text-[15px] leading-relaxed text-ink-soft">
+                      {club.org}
+                      <span className="ml-2 text-[13px] text-ink-muted">{club.role}</span>
+                    </li>
+                  ))}
+                </ul>
+              </dd>
+            </div>
           </dl>
         </div>
 
-        <ul className="mt-4 space-y-3">
-          {involvement.map((club) => (
-            <li
-              key={club.org}
-              className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 rounded-lg border border-rule px-6 py-4"
-            >
-              <span className="font-serif text-[15px] font-semibold text-ink">
-                {club.org}
-                <span className="ml-2.5 font-sans text-[13px] font-normal text-ink-muted">
-                  {club.role}
-                </span>
-              </span>
-              <span className="tnum text-[13px] text-ink-muted">{club.period}</span>
-            </li>
-          ))}
-          <li className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 rounded-lg border border-rule px-6 py-4">
-            <span className="font-serif text-[15px] font-semibold text-ink">
+        <div className="mt-4 rounded-lg border border-rule px-6 py-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+            <p className="font-serif text-[15px] font-semibold text-ink">
               {education.priorSchool.name}
-            </span>
-            <span className="tnum text-[13px] text-ink-muted">{education.priorSchool.period}</span>
-          </li>
-        </ul>
+            </p>
+            <p className="tnum text-[13px] text-ink-muted">{education.priorSchool.period}</p>
+          </div>
+          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
+            {education.priorSchool.detail.map((item) => (
+              <li
+                key={item}
+                className="relative pl-4 text-[14px] text-ink-soft before:absolute before:top-[0.62em] before:left-0 before:size-1 before:rounded-full before:bg-rule-strong"
+              >
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
       </Section>
 
       <Section id="skills" label="Skills" title="Tools and capabilities">
@@ -249,22 +257,20 @@ function Hero() {
 
   return (
     <section className="mx-auto max-w-6xl px-5 pt-14 pb-12 sm:px-8 sm:pt-24 sm:pb-16">
-      <div className="flex flex-col-reverse gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-14">
+      <div className="flex flex-col-reverse gap-6 lg:flex-row lg:items-start lg:justify-between lg:gap-14">
         <div className="min-w-0 flex-1">
-          <p className="eyebrow rise">{person.role}</p>
+          <p className="eyebrow">{person.role}</p>
           <h1
-            className="rise mt-4 font-serif text-[clamp(2.75rem,9vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-ink"
-            style={{ animationDelay: "60ms" }}
+            className="mt-4 font-serif text-[clamp(2.75rem,9vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-ink"
           >
             {person.name}
           </h1>
           <p
-            className="rise mt-6 max-w-2xl text-[17px] leading-[1.7] text-ink-soft"
-            style={{ animationDelay: "120ms" }}
+            className="mt-6 max-w-2xl text-[17px] leading-[1.7] text-ink-soft"
           >
             {person.intro}
           </p>
-          <div className="rise mt-8 flex flex-wrap gap-3" style={{ animationDelay: "180ms" }}>
+          <div className="mt-8 flex flex-wrap gap-3">
             <ActionButton
               href={person.resume}
               download="Hayden-Lin-Resume.pdf"
@@ -282,22 +288,20 @@ function Hero() {
         </div>
 
         {portrait ? (
-          <div className="rise shrink-0" style={{ animationDelay: "120ms" }}>
-            <Image
-              src={portrait}
-              alt={`${person.name}, portrait`}
-              width={220}
-              height={220}
-              priority
-              className="size-32 rounded-lg border border-rule object-cover sm:size-40 lg:size-[220px]"
-            />
-          </div>
+          <Image
+            src={portrait}
+            alt={`${person.name}, portrait`}
+            width={440}
+            height={550}
+            priority
+            className="w-[112px] shrink-0 rounded-lg border border-rule object-cover object-[50%_28%] sm:w-[132px] lg:w-[208px]"
+            style={{ aspectRatio: "4 / 5" }}
+          />
         ) : null}
       </div>
 
       <dl
-        className="rise mt-14 grid grid-cols-2 border-t border-rule sm:grid-cols-4"
-        style={{ animationDelay: "240ms" }}
+        className="mt-14 grid grid-cols-2 border-t border-rule sm:grid-cols-4"
       >
         {quickFacts.map((fact) => (
           <div key={fact.label} className="border-b border-rule py-5 pr-6 sm:border-b-0">
@@ -310,8 +314,7 @@ function Hero() {
       </dl>
 
       <dl
-        className="rise grid grid-cols-2 border-t border-rule sm:grid-cols-4"
-        style={{ animationDelay: "300ms" }}
+        className="grid grid-cols-2 border-t border-rule sm:grid-cols-4"
       >
         {trackRecord.map((stat) => (
           <div key={stat.label} className="border-b border-rule py-5 pr-6 sm:border-b-0">

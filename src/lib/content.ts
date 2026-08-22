@@ -85,8 +85,6 @@ export const experience: Experience[] = [
       "Maintain seven active channels and direct production of roughly 150 short form videos per month through standardized scripting, editing, quality control, and publishing workflows.",
       "Lead 11 paid editors and approximately 15 total team members past and present, overseeing hiring, training, performance reviews, workload allocation, and production deadlines.",
       "Generated five figure revenue and built a 2,000 member Discord community by applying retention analytics, creator partnerships, and channel level performance data to growth decisions.",
-      "Extended the flagship channel into a multi platform distribution pipeline that repurposes short form output to TikTok, Instagram, and Facebook, adding roughly 5M incremental views.",
-      "Designed and shipped a channel website with live multi platform statistics, built to give sponsors a single place to see reach.",
     ],
     href: "/channels",
     hrefLabel: "See the live channel numbers",
@@ -156,6 +154,23 @@ export const projects: Project[] = [
     ],
   },
   {
+    title: "Griff",
+    kind: "Community Economy",
+    period: "April 2025 to Present",
+    summary:
+      "A points economy running inside the 2,000 member Discord attached to the channels, built on a configurable currency bot rather than one I wrote, and designed around what actually keeps people coming back.",
+    bullets: [
+      "Designed the earning and spending loop end to end: what commands pay out, what they pay, and what the coins buy, from Discord roles to in game Brawl Stars rewards.",
+      "Drew 1,110 participants and roughly 175,000 messages across the two channels the economy runs in, over more than a year of continuous operation.",
+      "Tuned payouts and prices against participation, treating the reward pool as a budget and the sinks as the lever that keeps the currency worth earning.",
+    ],
+    metrics: [
+      { label: "Participants", value: "1,110" },
+      { label: "Messages", value: "~175K" },
+      { label: "Running since", value: "Apr 2025" },
+    ],
+  },
+  {
     title: "Forge",
     kind: "AI Fitness App",
     period: "June 2026 to Present",
@@ -191,19 +206,16 @@ export const education = {
     "Marketing",
     "Management",
   ],
-  involvement: ["Little Investment Bankers at Rutgers", "Ascend New Brunswick"],
-  priorSchool: { name: "Millburn High School", period: "2021 to 2025" },
+  involvement: [
+    { org: "Little Investment Bankers at Rutgers", role: "Member" },
+    { org: "Ascend New Brunswick", role: "Member" },
+  ],
+  priorSchool: {
+    name: "Millburn High School",
+    period: "2021 to 2025",
+    detail: ["SAT: 1540", "Varsity Swimming, Captain", "Investment Club, Vice President"],
+  },
 } as const;
-
-/**
- * Roles are stated plainly. "Member" is what these were, and a reader who has
- * sat on the other side of a resume screen can tell the difference between a
- * member and a chair anyway.
- */
-export const involvement = [
-  { org: "Little Investment Bankers at Rutgers", role: "Member", period: "2025 to Present" },
-  { org: "Ascend New Brunswick", role: "Member", period: "2025 to Present" },
-] as const;
 
 export const skillGroups = [
   {
@@ -273,6 +285,7 @@ export const platforms = [
  * editor cuts the videos, and it dilutes the page when it sits next to Bloomberg.
  */
 export const productionTools = [
+  "Claude Code",
   "YouTube Studio",
   "CapCut",
   "DaVinci Resolve",
@@ -284,10 +297,8 @@ export const productionTools = [
 export const credentials = [
   "Bloomberg Market Concepts",
   "Bloomberg Finance Fundamentals",
-  "CITI Research Certification",
-  "Social, Behavioral, and Epidemiologic Research Investigators",
+  "CITI Social, Behavioral, and Epidemiologic Research Investigators",
   "Excel Essential Training (Microsoft 365)",
-  "AP Scholar With Distinction",
 ] as const;
 
 export const honors = [

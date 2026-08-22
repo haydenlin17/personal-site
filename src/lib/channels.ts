@@ -80,7 +80,7 @@ export const channels: Channel[] = [
     handle: "MysticW1nter",
     id: "UCQYBIMZI8leQdofV3WfYNcg",
     name: "Winter Top 5",
-    niche: "Top 5 lists",
+    niche: "Ranking",
     startedAt: "2025-07-30",
     baseline: { subscribers: 1_180, views: 1_358_899, videos: 47 },
   },

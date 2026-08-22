@@ -21,42 +21,71 @@ export function ChannelsLive({ initial }: { initial: StatsPayload }) {
   const [data, setData] = useState(initial);
   const [loading, setLoading] = useState(false);
   const [failing, setFailing] = useState(false);
+  /** Held briefly after a successful refresh so the click has a visible result. */
+  const [confirmed, setConfirmed] = useState(false);
   const inFlight = useRef(false);
+  const confirmTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const refresh = useCallback(async () => {
+  /**
+   * Set when a person asked for the refresh, as opposed to the timer. Kept in a
+   * ref so a click that lands while a background refresh is already running can
+   * still claim the acknowledgement when that one finishes, instead of being
+   * swallowed by the in-flight guard and looking like a dead button.
+   */
+  const announce = useRef(false);
+
+  const run = useCallback(async () => {
     if (inFlight.current) return;
     inFlight.current = true;
-    setLoading(true);
+    const started = Date.now();
     try {
       const res = await fetch("/api/channels", { cache: "no-store" });
       if (!res.ok) throw new Error(`request failed with ${res.status}`);
       setData((await res.json()) as StatsPayload);
       setFailing(false);
+      if (announce.current) {
+        // The endpoint often answers from the edge cache faster than the eye can
+        // register, so hold the spinner long enough to be seen before confirming.
+        const elapsed = Date.now() - started;
+        if (elapsed < 450) await new Promise((r) => setTimeout(r, 450 - elapsed));
+        setConfirmed(true);
+        clearTimeout(confirmTimer.current);
+        confirmTimer.current = setTimeout(() => setConfirmed(false), 1800);
+      }
     } catch {
       // The numbers already on screen stay on screen; only the label changes.
       setFailing(true);
     } finally {
       setLoading(false);
+      announce.current = false;
       inFlight.current = false;
     }
   }, []);
 
+  /** What the button calls. Always acknowledges, in flight or not. */
+  const requestRefresh = useCallback(() => {
+    announce.current = true;
+    setLoading(true);
+    void run();
+  }, [run]);
+
   useEffect(() => {
     // Confirm the server's snapshot once the page has painted, then keep it warm.
-    const first = setTimeout(refresh, 400);
-    const id = setInterval(refresh, REFRESH_MS);
+    const first = setTimeout(run, 400);
+    const id = setInterval(run, REFRESH_MS);
     // Coming back to the tab should show current numbers, not whatever was on
     // screen when it was backgrounded.
     const onVisible = () => {
-      if (document.visibilityState === "visible") void refresh();
+      if (document.visibilityState === "visible") void run();
     };
     document.addEventListener("visibilitychange", onVisible);
     return () => {
       clearTimeout(first);
       clearInterval(id);
+      clearTimeout(confirmTimer.current);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [refresh]);
+  }, [run]);
 
   const stale = data.degraded || failing;
 
@@ -87,11 +116,28 @@ export function ChannelsLive({ initial }: { initial: StatsPayload }) {
         </p>
         <button
           type="button"
-          onClick={() => void refresh()}
+          onClick={requestRefresh}
           disabled={loading}
-          className="rounded-full border border-rule px-3.5 py-1.5 text-[13px] text-ink-soft transition hover:border-rule-strong hover:text-ink disabled:opacity-50"
+          aria-live="polite"
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] transition disabled:opacity-70 ${
+            confirmed
+              ? "border-accent text-accent"
+              : "border-rule text-ink-soft hover:border-rule-strong hover:text-ink"
+          }`}
         >
-          {loading ? "Refreshing" : "Refresh"}
+          {confirmed ? (
+            <svg
+              viewBox="0 0 24 24"
+              className="size-3.5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              aria-hidden
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
+            </svg>
+          ) : null}
+          {confirmed ? "Updated" : loading ? "Refreshing" : "Refresh"}
         </button>
       </div>
 
@@ -102,13 +148,6 @@ export function ChannelsLive({ initial }: { initial: StatsPayload }) {
           ))}
         </div>
       ) : null}
-
-      <p className="mt-8 max-w-2xl text-[13px] leading-relaxed text-ink-muted">
-        Subscriber counts are read straight from YouTube, which publishes them rounded to three
-        significant figures. View counts are exact, and the view counter carries on between reads at
-        the rate the channels have been measured moving.
-        {privacy.anonymous ? " Channels are listed without names: they are run facelessly." : ""}
-      </p>
 
       <ProofSection />
 
@@ -238,9 +277,10 @@ function ProofSection() {
         Peak 48 hour windows
       </h2>
       <p className="mt-3 max-w-2xl text-[15px] leading-[1.7] text-ink-soft">
-        Straight from YouTube Studio on days the network was running hot. These are peaks, not a
-        typical day, which is why each one is dated. Cropped above the video list, so they show the
-        totals and the shape of the traffic and nothing else.
+        Each of these is a two day window from YouTube Studio, the private dashboard behind a
+        channel. The large number is how many times the videos were watched across those 48 hours,
+        and the bars underneath show when those views came in. Cropped above the video list, so they
+        show the totals and the shape of the traffic and nothing else.
       </p>
 
       <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
