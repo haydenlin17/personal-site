@@ -1,15 +1,15 @@
 import { unstable_cache } from "next/cache";
-import { channels, privacy, type Channel } from "./channels";
+import { baselineAt, channels, privacy, type Channel } from "./channels";
 import { loadState, saveState, type StoredState } from "./stats-store";
 import type { ChannelSample, ChannelStats, StatsPayload, StatSource } from "./youtube-types";
 
 export type { ChannelStats, StatsPayload, StatSource } from "./youtube-types";
 
 /**
- * Reading the eight channels, in order of preference:
+ * Reading the channels, in order of preference:
  *
  *   1. The YouTube Data API, if YOUTUBE_API_KEY is set. One request covers all
- *      eight channels and costs a single quota unit out of a daily 10,000.
+ *      the channels and costs a single quota unit out of a daily 10,000.
  *   2. The public channel page, scraped. Same numbers YouTube shows a logged
  *      out visitor, so this is a true fallback rather than a downgrade.
  *   3. The hand verified baseline in channels.ts, clearly labelled as cached.
@@ -69,7 +69,7 @@ export function parseCompact(raw: string): number | null {
 
 type Read = { subscribers: number; views: number; videos: number; avatar: string | null };
 
-/** One request for all eight channels. Returns a map keyed by channel id. */
+/** One request covering every channel. Returns a map keyed by channel id. */
 async function readViaApi(key: string): Promise<Map<string, Read>> {
   const ids = channels.map((c) => c.id).join(",");
   const res = await get(
@@ -130,8 +130,23 @@ async function readViaScrape(handle: string): Promise<Read | null> {
   }
 }
 
-/** The one rate that needs no history and cannot be thrown off by lumpy publishing. */
-function lifetimeRate(channel: Channel, views: number): number {
+/**
+ * A rate that needs nothing persisted: today's total against the hand verified
+ * baseline, over the days between them. The window is far too wide for lumpy
+ * publishing to distort it, and unlike a lifetime average it describes the
+ * channel as it is now rather than as it averaged out over every year it has
+ * existed. A dormant channel correctly reads as zero.
+ *
+ * Falls back to the lifetime average only when that comparison cannot be made:
+ * a baseline too fresh to measure against, or a total that has gone backwards.
+ */
+const MIN_SEED_WINDOW_S = 6 * 60 * 60;
+
+function seedRate(channel: Channel, views: number): number {
+  const since = (Date.now() - Date.parse(baselineAt)) / 1000;
+  const delta = views - channel.baseline.views;
+  if (since > MIN_SEED_WINDOW_S && delta >= 0) return delta / since;
+
   const age = Math.max(1, (Date.now() - Date.parse(channel.startedAt)) / 1000);
   return views / age;
 }
@@ -150,7 +165,7 @@ function advance(
   prev: ChannelSample | undefined,
   nowIso: string,
 ): { sample: ChannelSample; rate: number } {
-  const seed = lifetimeRate(channel, views);
+  const seed = seedRate(channel, views);
 
   if (!prev) {
     return { sample: { views, at: nowIso, rate: seed, seeded: true }, rate: seed };

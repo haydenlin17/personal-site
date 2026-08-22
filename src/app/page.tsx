@@ -181,40 +181,6 @@ export default function ProfilePage() {
         </div>
       </Section>
 
-      <Section id="contact" label="Contact" title="Get in touch">
-        <div className="max-w-2xl">
-          <p className="text-[16px] leading-[1.75] text-ink-soft">
-            I am always open to talk about markets, research, or anything being built from scratch.
-            The fastest way to reach me is email.
-          </p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a
-              href={`mailto:${person.email}`}
-              className="rounded-full bg-accent px-5 py-2.5 text-[14px] font-medium text-paper transition hover:bg-accent-soft"
-            >
-              {person.email}
-            </a>
-            <a
-              href={person.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-full border border-rule-strong px-5 py-2.5 text-[14px] font-medium text-ink transition hover:border-ink hover:bg-sunk"
-            >
-              LinkedIn
-            </a>
-            <a
-              href={person.resume}
-              download="Hayden-Lin-Resume.pdf"
-              className="rounded-full border border-rule-strong px-5 py-2.5 text-[14px] font-medium text-ink transition hover:border-ink hover:bg-sunk"
-            >
-              Download resume
-            </a>
-          </div>
-          <p className="mt-6 text-[13px] text-ink-muted">
-            Based in {person.location}, open to roles across the {person.region}.
-          </p>
-        </div>
-      </Section>
     </>
   );
 }
@@ -236,7 +202,7 @@ function Hero() {
         {person.intro}
       </p>
       <div
-        className="rise mt-9 grid max-w-2xl gap-3 sm:grid-cols-2"
+        className="rise mt-9 grid gap-3 sm:grid-cols-2 lg:max-w-4xl lg:grid-cols-3"
         style={{ animationDelay: "180ms" }}
       >
         <ActionCard
@@ -251,6 +217,13 @@ function Hero() {
           title="Send me an email"
           detail={person.email}
           icon={<MailIcon />}
+        />
+        <ActionCard
+          href={person.linkedin}
+          external
+          title="Connect on LinkedIn"
+          detail={person.linkedinLabel}
+          icon={<LinkedInIcon />}
         />
       </div>
 
@@ -297,17 +270,21 @@ function ActionCard({
   detail,
   icon,
   download,
+  external,
 }: {
   href: string;
   title: string;
   detail: string;
   icon: React.ReactNode;
   download?: string;
+  external?: boolean;
 }) {
   return (
     <a
       href={href}
       download={download}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
       className="group flex items-center gap-4 rounded-lg border border-rule bg-surface px-4 py-4 transition hover:border-accent hover:bg-sunk"
     >
       <span className="grid size-10 shrink-0 place-items-center rounded-full border border-rule bg-paper text-accent transition group-hover:border-accent">
@@ -359,6 +336,14 @@ function MailIcon() {
     >
       <rect x="3" y="5" width="18" height="14" rx="2.5" />
       <path strokeLinecap="round" strokeLinejoin="round" d="m3.5 7.5 7.4 5.2a2 2 0 0 0 2.2 0l7.4-5.2" />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-[17px]" fill="currentColor" aria-hidden>
+      <path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9.5h4v11H3v-11Zm6.5 0h3.8v1.5h.06a4.2 4.2 0 0 1 3.77-2c4 0 4.75 2.6 4.75 6v5.5h-4V16c0-1.4 0-3.2-2-3.2s-2.3 1.5-2.3 3.1v4.6h-4v-11Z" />
     </svg>
   );
 }

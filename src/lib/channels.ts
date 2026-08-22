@@ -1,18 +1,28 @@
 /**
- * The eight channels tracked on /channels.
+ * The channels tracked on /channels.
  *
  * `id` is the YouTube channel id (UC...). It is only needed for the Data API
- * path, which reads all eight in a single request. The scrape path works from
+ * path, which reads them all in a single request. The scrape path works from
  * the handle alone.
  *
  * `startedAt` is the channel's public "Joined" date. It anchors a lifetime
  * average views-per-second, which is the seed rate for the live counter before
  * two real readings exist to measure against.
  *
- * `baseline` is the last hand verified reading, taken 2026-08-17. It is a floor,
- * not a display value: the page shows it only when both the API and the scrape
- * fail, and labels the card as showing a cached number when it does.
+ * `baseline` is the last hand verified reading. It does two jobs: it is what the
+ * page falls back to when both the API and the scrape fail (labelled as cached
+ * when that happens), and it is the far end of the pair the live view rate is
+ * measured from. Comparing today's total against a reading from days ago is a
+ * real measurement over a real window, and unlike the in-flight sampling it
+ * needs nothing to have been persisted.
  */
+
+/**
+ * When the baselines below were taken, and last confirmed still current. Refresh
+ * this and the `baseline` figures every month or so: the window only widens, and
+ * a wide window averages away whatever the channels are doing lately.
+ */
+export const baselineAt = "2026-08-18T00:19:51Z";
 
 export type Channel = {
   handle: string;
@@ -81,30 +91,6 @@ export const channels: Channel[] = [
     niche: "Roblox",
     startedAt: "2026-07-21",
     baseline: { subscribers: 380, views: 186_702, videos: 27 },
-  },
-  {
-    handle: "LlamaBloxx",
-    id: "UC29zMQpJAOqlKTIymV2hjAw",
-    name: "LlamaBlox",
-    niche: "Roblox",
-    startedAt: "2024-08-05",
-    baseline: { subscribers: 22, views: 0, videos: 0 },
-  },
-  {
-    handle: "scallyanimations",
-    id: "UClU_A0Jk5T3uyV-yZwvgBFA",
-    name: "Scally Animations",
-    niche: "Animation",
-    startedAt: "2026-06-17",
-    baseline: { subscribers: 13, views: 354, videos: 3 },
-  },
-  {
-    handle: "scally_reacts",
-    id: "UCvkSOrVCSQlJNocNQKJ0Guw",
-    name: "Scally Reacts",
-    niche: "Reactions",
-    startedAt: "2025-03-20",
-    baseline: { subscribers: 7, views: 46, videos: 4 },
   },
 ];
 

@@ -11,7 +11,8 @@ export const revalidate = 600;
 
 export const metadata: Metadata = {
   title: "Channels",
-  description: `Live subscriber and view counts for the ${channels.length} YouTube channels Hayden Lin runs and manages.`,
+  description:
+    "Live subscriber and view counts for the YouTube channels Hayden Lin runs and manages.",
 };
 
 export default async function ChannelsPage() {
@@ -30,9 +31,9 @@ export default async function ChannelsPage() {
         className="rise mt-5 max-w-2xl text-[17px] leading-[1.7] text-ink-soft"
         style={{ animationDelay: "120ms" }}
       >
-        The {channels.length} YouTube channels I run and manage, pulled live from YouTube every time
-        this page loads. What started as one Brawl Stars channel is now a small studio spanning
-        memes, Roblox, animation, and reactions.
+        The {channels.length} channels carrying the network, pulled live from YouTube every time this
+        page loads. What started as one Brawl Stars channel is now a small studio spanning memes,
+        list content, and Roblox.
       </p>
 
       <div className="rise mt-12" style={{ animationDelay: "180ms" }}>

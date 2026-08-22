@@ -5,7 +5,7 @@ Personal site. Next.js 16 (App Router, Turbopack) and Tailwind v4, deployed on V
 Two tabs:
 
 - `/` the profile a recruiter reads: hero, about, experience, selected work, education, skills, contact.
-- `/channels` live subscriber and view counts for the eight YouTube channels Hayden runs.
+- `/channels` live subscriber and view counts for the YouTube channels Hayden runs.
 
 ## Editing content
 
@@ -31,9 +31,9 @@ CSS variables (`:root` for light, `.dark` for dark). Nothing else hardcodes a co
 
 ## How the channel stats work
 
-`src/lib/youtube.ts` reads the eight channels in this order:
+`src/lib/youtube.ts` reads the channels in this order:
 
-1. **YouTube Data API**, if `YOUTUBE_API_KEY` is set. One request covers all eight
+1. **YouTube Data API**, if `YOUTUBE_API_KEY` is set. One request covers all
    channels and costs one unit out of a daily quota of 10,000.
 2. **The public channel page**, scraped. This is what runs today, and it is what
    the numbers on the live site come from.
@@ -76,20 +76,29 @@ things prevent that:
 - A rate is only derived once those two timestamps sit at least three hours
   apart.
 
-Until a channel has two readings that far apart, the rate is its lifetime
-average, `views / age`. That is deliberately conservative: it undercounts a
-channel that scaled recently, and undercounting only means the number catches up
-at the next read, while overcounting means it overshoots and has to visibly fall
-back. The first real measurement replaces the seed outright, and later ones are
-blended in at half weight so a single wide gap cannot redefine the rate.
+Until a channel has two live readings that far apart, the rate comes from the
+`baseline` figures and `baselineAt` in `channels.ts`: today's total against a
+hand verified reading from days ago, divided by the days between them. That is a
+real measurement over a window far too wide for lumpy publishing to distort, and
+it needs nothing to have been persisted, so it survives a cold start and a
+storage outage alike. A dormant channel correctly reads as zero.
 
-**A newly deployed site ticks slowly for the first few hours.** It is running on
-lifetime averages until it has watched the channels long enough to measure them.
-That is expected and it corrects itself.
+**Refresh `baseline` and `baselineAt` every month or so.** The window only
+widens, and a wide enough window averages away whatever the channels are doing
+lately. Re-read the totals, paste them in, and stamp the date.
 
-Readings persist to Vercel Blob via `BLOB_READ_WRITE_TOKEN`. Without that
-variable the history lives in memory only, which a serverless cold start wipes,
-and the rate never gets past the lifetime seed.
+A lifetime average (`views / age`) sits underneath as the last resort, used only
+when the baseline is too fresh to measure against. It is a poor description of a
+channel that scaled recently, which is why it is no longer the primary seed.
+
+Live sampling, when it works, is more responsive than either: the first real
+measurement replaces the seed outright, and later ones are blended in at half
+weight so a single wide gap cannot redefine the rate. Those readings persist to
+Vercel Blob via `BLOB_READ_WRITE_TOKEN`. Without it the history lives in memory
+only, which a serverless cold start wipes, and the page runs on the baseline
+measurement instead. That is a graceful degradation rather than a failure, which
+matters because the shared Blob store was suspended as of 2026-08-22 and writes
+were failing.
 
 The read is cached for ten minutes and shared by every visitor, so a busy day
 still means six reads an hour. `/channels` is prerendered with real numbers, then

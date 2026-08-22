@@ -261,5 +261,4 @@ export const sections = [
   { id: "work", label: "Work" },
   { id: "education", label: "Education" },
   { id: "skills", label: "Skills" },
-  { id: "contact", label: "Contact" },
 ] as const;
