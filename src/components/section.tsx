@@ -11,15 +11,25 @@ export function Section({
   title,
   lead,
   children,
+  index = 0,
 }: {
   id: string;
   label: string;
   title?: string;
   lead?: string;
   children: ReactNode;
+  /** Position in the page, used only to stagger the entrance. */
+  index?: number;
 }) {
   return (
-    <section id={id} className="border-t border-rule py-16 sm:py-20">
+    <section
+      id={id}
+      className="rise border-t border-rule py-16 sm:py-20"
+      // Every section animates, so nothing sits finished in frame while
+      // something above it is still arriving. Capped so the last one is not
+      // waiting seconds to appear.
+      style={{ animationDelay: `${Math.min(index, 6) * 90 + 300}ms` }}
+    >
       <div className="mx-auto grid max-w-6xl gap-8 px-5 sm:px-8 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-16">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <p className="eyebrow">{label}</p>

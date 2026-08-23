@@ -22,19 +22,32 @@ import {
 /** Drop a square portrait here and it appears; leave it out and the hero adapts. */
 const PORTRAIT = "headshot.jpg";
 
+/**
+ * One treatment for every block on the page: a bordered panel on the raised
+ * surface. Sections used to disagree with each other, one carrying a rule down
+ * its left edge, one using panels, one using neither.
+ */
+const CARD = "rounded-lg border border-rule bg-surface p-6 sm:p-7";
+
+/** Bulleted line, shared by every list of points on the page. */
+const BULLET =
+  "relative pl-4 text-[15px] leading-[1.7] text-ink-soft before:absolute before:top-[0.7em] before:left-0 before:size-1 before:rounded-full before:bg-rule-strong";
+
 export default function ProfilePage() {
   return (
     <>
       <ScrollToTop />
       <Hero />
 
-      <Section id="about" label="About" title="Who I am">
-        <div className="max-w-2xl space-y-5">
-          {about.paragraphs.map((p) => (
-            <p key={p.slice(0, 24)} className="text-[16px] leading-[1.75] text-ink-soft">
-              {p}
-            </p>
-          ))}
+      <Section id="about" label="About" title="Who I am" index={1}>
+        <div className={CARD}>
+          <div className="max-w-2xl space-y-5">
+            {about.paragraphs.map((p) => (
+              <p key={p.slice(0, 24)} className="text-[15px] leading-[1.75] text-ink-soft">
+                {p}
+              </p>
+            ))}
+          </div>
         </div>
       </Section>
 
@@ -43,10 +56,11 @@ export default function ProfilePage() {
         label="Experience"
         title="What I do"
         lead="Trading, operating, and research, run in parallel."
+        index={2}
       >
-        <ol className="space-y-12">
+        <ol className="space-y-4">
           {experience.map((job) => (
-            <li key={job.org} className="border-l border-rule pl-6">
+            <li key={job.org} className={CARD}>
               <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
                 <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
                   {job.org}
@@ -57,10 +71,7 @@ export default function ProfilePage() {
               <p className="mt-0.5 text-[13px] text-ink-muted">{job.location}</p>
               <ul className="mt-4 space-y-2.5">
                 {job.bullets.map((b) => (
-                  <li
-                    key={b.slice(0, 24)}
-                    className="relative pl-4 text-[15px] leading-[1.7] text-ink-soft before:absolute before:top-[0.7em] before:left-0 before:size-1 before:rounded-full before:bg-rule-strong"
-                  >
+                  <li key={b.slice(0, 24)} className={BULLET}>
                     {b}
                   </li>
                 ))}
@@ -71,16 +82,7 @@ export default function ProfilePage() {
                   className="group mt-5 inline-flex items-center gap-1.5 text-[14px] font-medium text-accent transition hover:text-accent-soft"
                 >
                   {job.hrefLabel ?? "Open"}
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="size-3.5 transition group-hover:translate-x-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    aria-hidden
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
+                  <Arrow />
                 </Link>
               ) : null}
             </li>
@@ -93,27 +95,22 @@ export default function ProfilePage() {
         label="Work"
         title="Projects"
         lead="Research, systems, and products built end to end."
+        index={3}
       >
-        <div className="space-y-5">
+        <div className="space-y-4">
           {projects.map((p) => (
-            <article
-              key={p.title}
-              className="rounded-lg border border-rule bg-surface p-6 transition hover:border-rule-strong sm:p-7"
-            >
+            <article key={p.title} className={CARD}>
               <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-                <p className="eyebrow">{p.kind}</p>
-                <p className="tnum text-[12px] text-ink-muted">{p.period}</p>
+                <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
+                  {p.title}
+                </h3>
+                <p className="tnum text-[13px] text-ink-muted">{p.period}</p>
               </div>
-              <h3 className="mt-2.5 font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
-                {p.title}
-              </h3>
-              <p className="mt-2.5 max-w-2xl text-[15px] leading-[1.7] text-ink-soft">{p.summary}</p>
+              <p className="mt-1.5 text-[14px] font-medium text-accent">{p.kind}</p>
+              <p className="mt-3 max-w-2xl text-[15px] leading-[1.7] text-ink-soft">{p.summary}</p>
               <ul className="mt-4 space-y-2.5">
                 {p.bullets.map((b) => (
-                  <li
-                    key={b.slice(0, 24)}
-                    className="relative pl-4 text-[15px] leading-[1.7] text-ink-soft before:absolute before:top-[0.7em] before:left-0 before:size-1 before:rounded-full before:bg-rule-strong"
-                  >
+                  <li key={b.slice(0, 24)} className={BULLET}>
                     {b}
                   </li>
                 ))}
@@ -126,16 +123,7 @@ export default function ProfilePage() {
                   className="group mt-5 inline-flex items-center gap-1.5 text-[14px] font-medium text-accent transition hover:text-accent-soft"
                 >
                   {p.hrefLabel ?? "Open"}
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="size-3.5 transition group-hover:translate-x-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    aria-hidden
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
+                  <Arrow />
                 </a>
               ) : null}
               {p.metrics ? (
@@ -143,7 +131,7 @@ export default function ProfilePage() {
                   {p.metrics.map((m) => (
                     <div key={m.label}>
                       <dt className="eyebrow">{m.label}</dt>
-                      <dd className="tnum mt-1 font-serif text-xl font-semibold text-ink">
+                      <dd className="tnum mt-1 font-serif text-[20px] font-semibold text-ink">
                         {m.value}
                       </dd>
                     </div>
@@ -155,88 +143,59 @@ export default function ProfilePage() {
         </div>
       </Section>
 
-      <Section id="education" label="Education" title="School">
-        <div className="rounded-lg border border-rule bg-surface p-6 sm:p-7">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-            <h3 className="font-serif text-xl font-semibold tracking-tight text-ink">
-              {education.school}
-            </h3>
-            <p className="tnum text-[13px] text-ink-muted">{education.period}</p>
-          </div>
-          <p className="mt-1.5 text-[14px] font-medium text-accent">{education.degree}</p>
-          <p className="mt-0.5 text-[13px] text-ink-muted">{education.location}</p>
+      <Section id="education" label="Education" title="School" index={4}>
+        <div className="space-y-4">
+          <SchoolCard
+            name={education.school}
+            period={education.period}
+            role={education.degree}
+            location={education.location}
+            facts={[
+              { label: "Standing", value: education.standing },
+              { label: "GPA", value: education.gpa },
+              { label: "Coursework", value: education.coursework.join(", ") },
+              {
+                label: "Involvement",
+                value: education.involvement.map((c) => `${c.org} (${c.role})`).join(", "),
+              },
+            ]}
+          />
+          <SchoolCard
+            name={education.priorSchool.name}
+            period={education.priorSchool.period}
+            facts={[...education.priorSchool.facts]}
+          />
+        </div>
+      </Section>
 
-          <dl className="mt-6 grid grid-cols-1 gap-x-10 gap-y-5 border-t border-rule pt-5 sm:grid-cols-2">
-            <div>
-              <dt className="eyebrow">Standing</dt>
-              <dd className="mt-1 text-[15px] text-ink-soft">{education.standing}</dd>
-            </div>
-            <div>
-              <dt className="eyebrow">GPA</dt>
-              <dd className="tnum mt-1 text-[15px] text-ink-soft">{education.gpa}</dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="eyebrow">Coursework</dt>
-              <dd className="mt-1 text-[15px] leading-relaxed text-ink-soft">
-                {education.coursework.join(", ")}
-              </dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="eyebrow">Involvement</dt>
-              <dd className="mt-2">
-                <ul className="flex flex-col gap-1.5">
-                  {education.involvement.map((club) => (
-                    <li key={club.org} className="text-[15px] leading-relaxed text-ink-soft">
-                      {club.org}
-                      <span className="ml-2 text-[13px] text-ink-muted">{club.role}</span>
+      <Section id="skills" label="Skills" title="Tools and capabilities" index={5}>
+        <div className={CARD}>
+          <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
+            {skillGroups.map((group) => (
+              <div key={group.title}>
+                <h3 className="text-[14px] font-semibold text-ink">{group.title}</h3>
+                <ul className="mt-3 flex flex-wrap gap-1.5">
+                  {group.items.map((item) => (
+                    <li
+                      key={item}
+                      className="rounded-full border border-rule bg-paper px-3 py-1 text-[13px] text-ink-soft"
+                    >
+                      {item}
                     </li>
                   ))}
                 </ul>
-              </dd>
-            </div>
-          </dl>
-        </div>
-
-        <div className="mt-4 rounded-lg border border-rule bg-surface p-6 sm:p-7">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-            <h3 className="font-serif text-xl font-semibold tracking-tight text-ink">
-              {education.priorSchool.name}
-            </h3>
-            <p className="tnum text-[13px] text-ink-muted">{education.priorSchool.period}</p>
+              </div>
+            ))}
           </div>
-          <p className="mt-1.5 text-[14px] font-medium text-accent">
-            {education.priorSchool.detail.join("  ·  ")}
-          </p>
+
+          <div className="mt-10 grid gap-x-10 gap-y-8 border-t border-rule pt-8 sm:grid-cols-2">
+            <ListBlock title="Platforms" items={[...platforms]} />
+            <ListBlock title="Credentials" items={[...credentials]} />
+            <ListBlock title="Honors and awards" items={[...honors]} />
+            <ListBlock title="Languages" items={[...languages]} />
+          </div>
         </div>
       </Section>
-
-      <Section id="skills" label="Skills" title="Tools and capabilities">
-        <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
-          {skillGroups.map((group) => (
-            <div key={group.title}>
-              <h3 className="text-[14px] font-semibold text-ink">{group.title}</h3>
-              <ul className="mt-3 flex flex-wrap gap-1.5">
-                {group.items.map((item) => (
-                  <li
-                    key={item}
-                    className="rounded-full border border-rule bg-surface px-3 py-1 text-[13px] text-ink-soft"
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-10 grid gap-x-10 gap-y-8 border-t border-rule pt-8 sm:grid-cols-2">
-          <ListBlock title="Platforms" items={[...platforms]} />
-          <ListBlock title="Credentials" items={[...credentials]} />
-          <ListBlock title="Honors and awards" items={[...honors]} />
-          <ListBlock title="Languages" items={[...languages]} />
-        </div>
-      </Section>
-
     </>
   );
 }
@@ -248,20 +207,22 @@ function Hero() {
 
   return (
     <section className="mx-auto max-w-6xl px-5 pt-14 pb-12 sm:px-8 sm:pt-24 sm:pb-16">
-      <div className="flex flex-col-reverse gap-6 lg:flex-row lg:items-start lg:gap-12">
-        <div className="min-w-0 lg:max-w-[38rem]">
-          <p className="eyebrow">{person.role}</p>
+      <div className="flex flex-col-reverse gap-7 lg:flex-row lg:items-start lg:gap-14">
+        <div className="min-w-0 flex-1">
+          <p className="eyebrow rise">{person.role}</p>
           <h1
-            className="mt-4 font-serif text-[clamp(2.75rem,9vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-ink"
+            className="rise mt-4 font-serif text-[clamp(2.75rem,9vw,5.25rem)] leading-[0.95] font-semibold tracking-[-0.03em] text-ink"
+            style={{ animationDelay: "60ms" }}
           >
             {person.name}
           </h1>
           <p
-            className="mt-6 max-w-2xl text-[17px] leading-[1.7] text-ink-soft"
+            className="rise mt-6 max-w-2xl text-[17px] leading-[1.7] text-ink-soft"
+            style={{ animationDelay: "120ms" }}
           >
             {person.intro}
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="rise mt-8 flex flex-wrap gap-3" style={{ animationDelay: "180ms" }}>
             <ActionButton
               href={person.resume}
               download="Hayden-Lin-Resume.pdf"
@@ -282,21 +243,25 @@ function Hero() {
           <Image
             src={portrait}
             alt={`${person.name}, portrait`}
-            width={504}
-            height={504}
+            width={640}
+            height={640}
             priority
-            className="size-[132px] shrink-0 rounded-lg border border-rule object-cover sm:size-[160px] lg:size-[252px]"
+            className="rise size-[148px] shrink-0 rounded-lg border border-rule object-cover sm:size-[188px] lg:size-[320px]"
+            style={{ animationDelay: "60ms" }}
           />
         ) : null}
       </div>
 
+      {/* Both strips carry the same weight of information, so they render at the
+          same size. One of them being twice the other read as a mistake. */}
       <dl
-        className="mt-14 grid grid-cols-2 border-t border-rule sm:grid-cols-4"
+        className="rise mt-14 grid grid-cols-2 border-t border-rule sm:grid-cols-4"
+        style={{ animationDelay: "240ms" }}
       >
         {quickFacts.map((fact) => (
           <div key={fact.label} className="border-b border-rule py-5 pr-6 sm:border-b-0">
             <dt className="eyebrow">{fact.label}</dt>
-            <dd className="mt-1.5 font-serif text-[17px] leading-snug font-semibold text-ink">
+            <dd className="mt-1.5 font-serif text-[20px] leading-snug font-semibold text-ink">
               {fact.value}
             </dd>
           </div>
@@ -304,18 +269,55 @@ function Hero() {
       </dl>
 
       <dl
-        className="grid grid-cols-2 border-t border-rule sm:grid-cols-4"
+        className="rise grid grid-cols-2 border-t border-rule sm:grid-cols-4"
+        style={{ animationDelay: "300ms" }}
       >
         {trackRecord.map((stat) => (
           <div key={stat.label} className="border-b border-rule py-5 pr-6 sm:border-b-0">
-            <dd className="tnum font-serif text-[clamp(1.5rem,3.5vw,2rem)] leading-none font-semibold tracking-tight text-ink">
+            <dd className="tnum font-serif text-[20px] leading-snug font-semibold text-ink">
               {stat.value}
             </dd>
-            <dt className="eyebrow mt-2">{stat.label}</dt>
+            <dt className="eyebrow mt-1.5">{stat.label}</dt>
           </div>
         ))}
       </dl>
     </section>
+  );
+}
+
+/** Both schools render through this, so neither can drift from the other. */
+function SchoolCard({
+  name,
+  period,
+  role,
+  location,
+  facts,
+}: {
+  name: string;
+  period: string;
+  role?: string;
+  location?: string;
+  facts: { label: string; value: string }[];
+}) {
+  return (
+    <div className={CARD}>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+        <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
+          {name}
+        </h3>
+        <p className="tnum text-[13px] text-ink-muted">{period}</p>
+      </div>
+      {role ? <p className="mt-1.5 text-[14px] font-medium text-accent">{role}</p> : null}
+      {location ? <p className="mt-0.5 text-[13px] text-ink-muted">{location}</p> : null}
+      <dl className="mt-6 grid grid-cols-1 gap-x-10 gap-y-5 border-t border-rule pt-5 sm:grid-cols-2">
+        {facts.map((f) => (
+          <div key={f.label}>
+            <dt className="eyebrow">{f.label}</dt>
+            <dd className="mt-1 text-[15px] leading-relaxed text-ink-soft">{f.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
@@ -358,9 +360,24 @@ function ActionButton({
       rel={external ? "noreferrer" : undefined}
       className="inline-flex items-center gap-2.5 rounded-lg border border-rule-strong px-5 py-3 text-[15px] font-medium text-ink transition hover:border-accent hover:bg-sunk"
     >
-      <span className="text-ink-muted transition group-hover:text-accent">{icon}</span>
+      <span className="text-ink-muted">{icon}</span>
       {children}
     </a>
+  );
+}
+
+function Arrow() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-3.5 transition group-hover:translate-x-0.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
   );
 }
 
@@ -374,7 +391,11 @@ function DocumentIcon() {
       strokeWidth="1.7"
       aria-hidden
     >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"
+      />
       <path strokeLinecap="round" strokeLinejoin="round" d="M14 3v5h5M9 13h6M9 17h4" />
     </svg>
   );
@@ -391,7 +412,11 @@ function MailIcon() {
       aria-hidden
     >
       <rect x="3" y="5" width="18" height="14" rx="2.5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="m3.5 7.5 7.4 5.2a2 2 0 0 0 2.2 0l7.4-5.2" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="m3.5 7.5 7.4 5.2a2 2 0 0 0 2.2 0l7.4-5.2"
+      />
     </svg>
   );
 }

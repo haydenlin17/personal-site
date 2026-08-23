@@ -127,7 +127,7 @@
 @keyframes rise {
   from {
     opacity: 0;
-    transform: translateY(18px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -136,12 +136,12 @@
 }
 
 /*
- * The whole page arrives at once. Staggering individual elements meant the hero
- * animated while the sections under it were already sitting in frame, which read
- * as the page loading twice.
+ * Applied to the hero's parts and to every section, so the page cascades in as
+ * one movement. Animating only the hero left the sections beneath it sitting
+ * finished in frame while the top of the page was still arriving.
  */
-main {
-  animation: rise 0.62s cubic-bezier(0.16, 1, 0.3, 1) both;
+.rise {
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 
@@ -190,7 +190,7 @@ main {
     color: #4a4a4a;
   }
 
-  main {
+  .rise {
     animation: none !important;
   }
 }

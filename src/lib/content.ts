@@ -158,12 +158,10 @@ export const projects: Project[] = [
     kind: "Community Economy",
     period: "April 2025 to Present",
     summary:
-      "A virtual economy I designed and operate inside the 2,000 member Discord attached to the channels, built to turn an audience that watches into a community that shows up daily.",
+      "A virtual economy running inside the 2,000 member Discord attached to the channels, built to turn an audience that watches into a community that shows up daily.",
     bullets: [
-      "Designed the full earning and spending loop: which actions pay out, what they pay, and what the currency buys, from Discord roles to in game Brawl Stars rewards.",
-      "Grew it to 1,110 participants and roughly 175,000 messages across the two channels it runs in, sustained continuously for more than a year.",
-      "Priced every reward against a fixed budget and tuned the spending sinks so the currency holds its value as supply grows.",
-      "Read participation data to decide what to reprice, what to retire, and what to introduce next.",
+      "Engineered the currency system end to end: how often each command pays out, the odds of winning or losing on it, the coins at stake per action, and the pricing of everything they buy, from Discord roles to in game Brawl Stars rewards.",
+      "Sustained 1,110 participants and roughly 175,000 messages across two channels over 16 months of continuous operation.",
     ],
     metrics: [
       { label: "Participants", value: "1,110" },
@@ -214,7 +212,11 @@ export const education = {
   priorSchool: {
     name: "Millburn High School",
     period: "2021 to 2025",
-    detail: ["SAT: 1540", "Varsity Swimming, Captain", "Investment Club, Vice President"],
+    facts: [
+      { label: "SAT", value: "1540" },
+      { label: "Athletics", value: "Varsity Swimming, Captain" },
+      { label: "Involvement", value: "Investment Club, Vice President" },
+    ],
   },
 } as const;
 
