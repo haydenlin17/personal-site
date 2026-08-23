@@ -23,11 +23,11 @@ import {
 const PORTRAIT = "headshot.jpg";
 
 /**
- * One treatment for every block on the page: a bordered panel on the raised
- * surface. Sections used to disagree with each other, one carrying a rule down
- * its left edge, one using panels, one using neither.
+ * One treatment for every block on the page: a rule down the left edge. Quieter
+ * than a filled panel, and it keeps the page reading as a document rather than
+ * a stack of widgets.
  */
-const CARD = "rounded-lg border border-rule bg-surface p-6 sm:p-7";
+const RAIL = "border-l border-rule pl-6 sm:pl-7";
 
 /** Bulleted line, shared by every list of points on the page. */
 const BULLET =
@@ -40,7 +40,7 @@ export default function ProfilePage() {
       <Hero />
 
       <Section id="about" label="About" title="Who I am" index={1}>
-        <div className={CARD}>
+        <div className={RAIL}>
           <div className="max-w-2xl space-y-5">
             {about.paragraphs.map((p) => (
               <p key={p.slice(0, 24)} className="text-[15px] leading-[1.75] text-ink-soft">
@@ -58,13 +58,16 @@ export default function ProfilePage() {
         lead="Trading, operating, and research, run in parallel."
         index={2}
       >
-        <ol className="space-y-4">
+        <ol className="space-y-10">
           {experience.map((job) => (
-            <li key={job.org} className={CARD}>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-                <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
-                  {job.org}
-                </h3>
+            <li key={job.org} className={RAIL}>
+              <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+                <div className="flex items-center gap-3">
+                  <Logo name={job.logo} alt={`${job.org} logo`} />
+                  <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
+                    {job.org}
+                  </h3>
+                </div>
                 <p className="tnum text-[13px] text-ink-muted">{job.period}</p>
               </div>
               <p className="mt-1.5 text-[14px] font-medium text-accent">{job.role}</p>
@@ -97,13 +100,16 @@ export default function ProfilePage() {
         lead="Research, systems, and products built end to end."
         index={3}
       >
-        <div className="space-y-4">
+        <div className="space-y-10">
           {projects.map((p) => (
-            <article key={p.title} className={CARD}>
-              <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-                <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
-                  {p.title}
-                </h3>
+            <article key={p.title} className={RAIL}>
+              <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+                <div className="flex items-center gap-3">
+                  <Logo name={p.logo} alt={`${p.title} logo`} />
+                  <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
+                    {p.title}
+                  </h3>
+                </div>
                 <p className="tnum text-[13px] text-ink-muted">{p.period}</p>
               </div>
               <p className="mt-1.5 text-[14px] font-medium text-accent">{p.kind}</p>
@@ -144,9 +150,10 @@ export default function ProfilePage() {
       </Section>
 
       <Section id="education" label="Education" title="School" index={4}>
-        <div className="space-y-4">
+        <div className="space-y-10">
           <SchoolCard
             name={education.school}
+            logo={education.logo}
             period={education.period}
             role={education.degree}
             location={education.location}
@@ -162,28 +169,23 @@ export default function ProfilePage() {
           />
           <SchoolCard
             name={education.priorSchool.name}
+            logo={education.priorSchool.logo}
             period={education.priorSchool.period}
             facts={[...education.priorSchool.facts]}
+            columns={3}
           />
         </div>
       </Section>
 
       <Section id="skills" label="Skills" title="Tools and capabilities" index={5}>
-        <div className={CARD}>
+        <div className={RAIL}>
           <div className="grid gap-x-10 gap-y-8 sm:grid-cols-2">
             {skillGroups.map((group) => (
               <div key={group.title}>
                 <h3 className="text-[14px] font-semibold text-ink">{group.title}</h3>
-                <ul className="mt-3 flex flex-wrap gap-1.5">
-                  {group.items.map((item) => (
-                    <li
-                      key={item}
-                      className="rounded-full border border-rule bg-paper px-3 py-1 text-[13px] text-ink-soft"
-                    >
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                <p className="mt-2 text-[15px] leading-[1.7] text-ink-soft">
+                  {group.items.join(", ")}
+                </p>
               </div>
             ))}
           </div>
@@ -197,6 +199,23 @@ export default function ProfilePage() {
         </div>
       </Section>
     </>
+  );
+}
+
+/**
+ * Marks sit outside the rule, so a row reads as "logo, then the entry" rather
+ * than the logo being another item inside the text column.
+ */
+function Logo({ name, alt }: { name?: string; alt: string }) {
+  if (!name) return null;
+  return (
+    <Image
+      src={`/logos/${name}.png`}
+      alt={alt}
+      width={96}
+      height={96}
+      className="size-8 shrink-0 object-contain"
+    />
   );
 }
 
@@ -292,24 +311,36 @@ function SchoolCard({
   role,
   location,
   facts,
+  logo,
+  columns = 2,
 }: {
   name: string;
   period: string;
   role?: string;
   location?: string;
   facts: { label: string; value: string }[];
+  logo?: string;
+  /** Number of fact columns, so a short list can sit on one line. */
+  columns?: 2 | 3;
 }) {
   return (
-    <div className={CARD}>
-      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-        <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
-          {name}
-        </h3>
+    <div className={RAIL}>
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+        <div className="flex items-center gap-3">
+          <Logo name={logo} alt={`${name} logo`} />
+          <h3 className="font-serif text-xl leading-snug font-semibold tracking-tight text-ink">
+            {name}
+          </h3>
+        </div>
         <p className="tnum text-[13px] text-ink-muted">{period}</p>
       </div>
       {role ? <p className="mt-1.5 text-[14px] font-medium text-accent">{role}</p> : null}
       {location ? <p className="mt-0.5 text-[13px] text-ink-muted">{location}</p> : null}
-      <dl className="mt-6 grid grid-cols-1 gap-x-10 gap-y-5 border-t border-rule pt-5 sm:grid-cols-2">
+      <dl
+        className={`mt-6 grid grid-cols-1 gap-x-10 gap-y-5 border-t border-rule pt-5 ${
+          columns === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"
+        }`}
+      >
         {facts.map((f) => (
           <div key={f.label}>
             <dt className="eyebrow">{f.label}</dt>

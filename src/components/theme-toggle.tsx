@@ -38,45 +38,25 @@ export function ThemeToggle() {
       aria-label={`Switch to ${dark ? "light" : "dark"} mode`}
       className="grid size-9 shrink-0 place-items-center rounded-full border border-rule text-ink-soft transition hover:border-rule-strong hover:text-ink"
     >
-      {dark ? <MoonIcon /> : <SunIcon />}
+      <ContrastIcon flipped={dark} />
     </button>
   );
 }
 
-function SunIcon() {
+/**
+ * A disc with one half filled, the same mark in both themes and simply turned
+ * over. Reads as contrast rather than as weather, and sidesteps the sun and
+ * moon that every other site reaches for.
+ */
+function ContrastIcon({ flipped }: { flipped: boolean }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="size-[17px]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
+      className={`size-[17px] transition-transform duration-500 ${flipped ? "rotate-180" : ""}`}
       aria-hidden
     >
-      <circle cx="12" cy="12" r="4" />
-      <path
-        strokeLinecap="round"
-        d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.4 1.4M17.4 17.4l1.4 1.4M18.8 5.2l-1.4 1.4M6.6 17.4l-1.4 1.4"
-      />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="size-[17px]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      aria-hidden
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.2 8.2 0 1 0 10.2 10.2Z"
-      />
+      <circle cx="12" cy="12" r="8.25" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M12 3.75a8.25 8.25 0 0 1 0 16.5Z" fill="currentColor" />
     </svg>
   );
 }

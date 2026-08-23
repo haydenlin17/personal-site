@@ -61,6 +61,8 @@ export type Experience = {
   /** Optional link rendered under the bullets. */
   href?: string;
   hrefLabel?: string;
+  /** File in public/logos, without the extension. */
+  logo?: string;
 };
 
 export const experience: Experience[] = [
@@ -77,6 +79,7 @@ export const experience: Experience[] = [
   },
   {
     org: "YouTube Content Agency",
+    logo: "youtube",
     role: "Founder and Executive Director",
     location: "Millburn, NJ",
     period: "June 2024 to Present",
@@ -91,6 +94,7 @@ export const experience: Experience[] = [
   },
   {
     org: "Rutgers Department of Finance",
+    logo: "rutgers",
     role: "Undergraduate Research Assistant, Professor Alex Van Zant",
     location: "New Brunswick, NJ",
     period: "June 2026 to Present",
@@ -112,11 +116,14 @@ export type Project = {
   metrics?: { label: string; value: string }[];
   href?: string;
   hrefLabel?: string;
+  /** File in public/logos, without the extension. */
+  logo?: string;
 };
 
 export const projects: Project[] = [
   {
     title: "Life Time Group Holdings (NYSE: LTH)",
+    logo: "lifetime",
     kind: "Equity Research",
     period: "April 2026",
     summary:
@@ -155,6 +162,7 @@ export const projects: Project[] = [
   },
   {
     title: "Griff",
+    logo: "unbelievaboat",
     kind: "Community Economy",
     period: "April 2025 to Present",
     summary:
@@ -171,6 +179,7 @@ export const projects: Project[] = [
   },
   {
     title: "Forge",
+    logo: "forge",
     kind: "AI Fitness App",
     period: "June 2026 to Present",
     summary:
@@ -192,6 +201,7 @@ export const projects: Project[] = [
 
 export const education = {
   school: "Rutgers Business School",
+  logo: "rutgers",
   location: "New Brunswick, NJ",
   degree: "Bachelor of Science, Finance",
   period: "September 2025 to May 2029",
@@ -211,11 +221,12 @@ export const education = {
   ],
   priorSchool: {
     name: "Millburn High School",
+    logo: "millburn",
     period: "2021 to 2025",
     facts: [
       { label: "SAT", value: "1540" },
-      { label: "Athletics", value: "Varsity Swimming, Captain" },
-      { label: "Involvement", value: "Investment Club, Vice President" },
+      { label: "Athletics", value: "Varsity Swimming (Captain)" },
+      { label: "Involvement", value: "Investment Club (Vice President)" },
     ],
   },
 } as const;

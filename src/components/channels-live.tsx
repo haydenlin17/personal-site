@@ -156,16 +156,9 @@ export function ChannelsLive({ initial }: { initial: StatsPayload }) {
         <h2 className="mt-2 font-serif text-2xl leading-tight font-semibold tracking-tight text-ink">
           What runs the operation
         </h2>
-        <ul className="mt-5 flex flex-wrap gap-1.5">
-          {productionTools.map((tool) => (
-            <li
-              key={tool}
-              className="rounded-full border border-rule bg-surface px-3 py-1 text-[13px] text-ink-soft"
-            >
-              {tool}
-            </li>
-          ))}
-        </ul>
+        <p className="mt-4 max-w-2xl text-[15px] leading-[1.7] text-ink-soft">
+          {productionTools.join(", ")}
+        </p>
       </section>
     </>
   );
