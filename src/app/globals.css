@@ -183,13 +183,6 @@
     text-decoration: underline;
   }
 
-  /* A printed link is useless without its destination. */
-  main a[href^="http"]::after {
-    content: " (" attr(href) ")";
-    font-size: 0.75em;
-    color: #4a4a4a;
-  }
-
   .rise {
     animation: none !important;
   }

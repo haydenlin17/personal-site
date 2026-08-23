@@ -183,9 +183,16 @@ export default function ProfilePage() {
             {skillGroups.map((group) => (
               <div key={group.title}>
                 <h3 className="text-[14px] font-semibold text-ink">{group.title}</h3>
-                <p className="mt-2 text-[15px] leading-[1.7] text-ink-soft">
-                  {group.items.join(", ")}
-                </p>
+                <ul className="mt-3 columns-2 gap-x-8 space-y-1.5">
+                  {group.items.map((item) => (
+                    <li
+                      key={item}
+                      className="relative break-inside-avoid pl-4 text-[14px] leading-relaxed text-ink-soft before:absolute before:top-[0.62em] before:left-0 before:size-1 before:rounded-full before:bg-rule-strong"
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>

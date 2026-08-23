@@ -224,9 +224,9 @@ export const education = {
     logo: "millburn",
     period: "2021 to 2025",
     facts: [
-      { label: "SAT", value: "1540" },
       { label: "Athletics", value: "Varsity Swimming (Captain)" },
       { label: "Involvement", value: "Investment Club (Vice President)" },
+      { label: "SAT", value: "1540" },
     ],
   },
 } as const;

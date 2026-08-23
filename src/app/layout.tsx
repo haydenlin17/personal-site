@@ -4,6 +4,7 @@ import { Inter, Source_Serif_4 } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { person } from "@/lib/content";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const display = Source_Serif_4({
@@ -18,7 +19,6 @@ const body = Inter({
   variable: "--font-body",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://haydenlin.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

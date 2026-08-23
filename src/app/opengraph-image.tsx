@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { person, trackRecord } from "@/lib/content";
+import { siteHost } from "@/lib/site";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -98,7 +99,7 @@ export default async function Image() {
                 color: "#a9c4e8",
               }}
             >
-              haydenlin.vercel.app
+              {siteHost}
             </div>
           </div>
         </div>
