@@ -214,6 +214,9 @@ function Logo({ name, alt }: { name?: string; alt: string }) {
       alt={alt}
       width={96}
       height={96}
+      // A few KB each and mostly near the top: waiting on an intersection to
+      // fetch them only risks the marks popping in after the text.
+      loading="eager"
       className="size-8 shrink-0 object-contain"
     />
   );
