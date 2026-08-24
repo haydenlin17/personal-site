@@ -118,6 +118,8 @@ export type Project = {
   hrefLabel?: string;
   /** File in public/logos, without the extension. */
   logo?: string;
+  /** Optional supporting image, rendered under the bullets. */
+  media?: { src: string; alt: string; caption: string; width: number; height: number };
 };
 
 export const projects: Project[] = [
@@ -171,6 +173,14 @@ export const projects: Project[] = [
       "Engineered the currency system end to end: how often each command pays out, the odds of winning or losing on it, the coins at stake per action, and the pricing of everything they buy, from Discord roles to in game Brawl Stars rewards.",
       "Sustained 1,110 participants and roughly 175,000 messages across two channels over 16 months of continuous operation.",
     ],
+    media: {
+      src: "/proof/griff-leaderboard.png",
+      alt: "Leaderboard showing the top ten balances, names and avatars removed",
+      caption:
+        "Top ten balances, 24 August 2026. Names and avatars removed.",
+      width: 920,
+      height: 1437,
+    },
     metrics: [
       { label: "Participants", value: "1,110" },
       { label: "Messages", value: "~175K" },

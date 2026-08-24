@@ -121,6 +121,21 @@ export default function ProfilePage() {
                   </li>
                 ))}
               </ul>
+              {p.media ? (
+                <figure className="mt-6 w-full max-w-[280px]">
+                  <Image
+                    src={p.media.src}
+                    alt={p.media.alt}
+                    width={p.media.width}
+                    height={p.media.height}
+                    sizes="280px"
+                    className="h-auto w-full rounded-lg border border-rule"
+                  />
+                  <figcaption className="mt-2 text-[12px] leading-relaxed text-ink-muted">
+                    {p.media.caption}
+                  </figcaption>
+                </figure>
+              ) : null}
               {p.href ? (
                 <a
                   href={p.href}
