@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { capturedOn, leaderboard } from "@/lib/griff";
+import { leaderboard } from "@/lib/griff";
 
 export const metadata: Metadata = {
   title: "Griff leaderboard",
@@ -35,7 +35,8 @@ export default function GriffLeaderboard() {
           Griff leaderboard
         </h1>
         <p className="mt-4 max-w-2xl text-[15px] leading-[1.7] text-ink-soft">
-          The top thirty balances in the economy, as the leaderboard stood on {capturedOn}.
+          The top thirty balances in the economy. Commands average out to roughly 200 gems
+          each.
         </p>
       </header>
 
@@ -62,14 +63,12 @@ export default function GriffLeaderboard() {
               <span className="size-8 shrink-0 rounded-full bg-sunk" />
             )}
 
-            {/* The name that was here, struck out rather than shown. */}
+            {/* The name that was here, redacted to a bar rather than shown. */}
             <span
               aria-label="name redacted"
-              className="relative inline-block h-3.5 shrink-0 rounded-sm bg-rule"
+              className="inline-block h-3.5 shrink-0 rounded-sm bg-rule"
               style={{ width: `${row.nameWidth}px`, maxWidth: "40vw" }}
-            >
-              <span className="absolute top-1/2 left-0 h-px w-full -translate-y-1/2 bg-ink-muted" />
-            </span>
+            />
 
             <span className="ml-auto flex shrink-0 items-center gap-1.5">
               <span className="tnum font-serif text-[16px] font-semibold text-ink">
