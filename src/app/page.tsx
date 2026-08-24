@@ -184,7 +184,7 @@ export default function ProfilePage() {
               <div key={group.title}>
                 <h3 className="text-[14px] font-semibold text-ink">{group.title}</h3>
                 <ul className="mt-3 columns-2 gap-x-8 space-y-1.5">
-                  {group.items.map((item) => (
+                  {byLength(group.items).map((item) => (
                     <li
                       key={item}
                       className="relative break-inside-avoid pl-4 text-[14px] leading-relaxed text-ink-soft before:absolute before:top-[0.62em] before:left-0 before:size-1 before:rounded-full before:bg-rule-strong"
@@ -360,6 +360,15 @@ function SchoolCard({
       </dl>
     </div>
   );
+}
+
+/**
+ * Shortest first, so anything long enough to wrap onto a second line lands at
+ * the end of the list rather than breaking up the rows above it. These are
+ * unordered vocabularies, so nothing is lost by resequencing them.
+ */
+function byLength(items: readonly string[]): string[] {
+  return [...items].sort((a, b) => a.length - b.length);
 }
 
 function ListBlock({ title, items }: { title: string; items: string[] }) {
