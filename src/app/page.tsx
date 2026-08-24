@@ -133,7 +133,11 @@ export default function ProfilePage() {
                 </a>
               ) : null}
               {p.metrics ? (
-                <dl className="mt-6 grid grid-cols-1 gap-4 border-t border-rule pt-5 sm:grid-cols-3">
+                <dl
+                  className={`mt-6 grid grid-cols-1 gap-4 border-t border-rule pt-5 ${
+                    p.metrics.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3"
+                  }`}
+                >
                   {p.metrics.map((m) => (
                     <div key={m.label}>
                       <dt className="eyebrow">{m.label}</dt>

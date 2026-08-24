@@ -174,7 +174,6 @@ export const projects: Project[] = [
     metrics: [
       { label: "Participants", value: "1,110" },
       { label: "Messages", value: "~175K" },
-      { label: "Server members", value: "2,000" },
     ],
   },
   {
