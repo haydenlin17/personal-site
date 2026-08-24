@@ -5,7 +5,7 @@
  * live and everything that prints or links the address follows: canonical URLs,
  * Open Graph tags, and the address on the share card.
  */
-const FALLBACK = "https://haydenlin.vercel.app";
+const FALLBACK = "https://haydenlin.com";
 
 export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? FALLBACK;
 

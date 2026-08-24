@@ -1,4 +1,4 @@
-# haydenlin.vercel.app
+# haydenlin.com
 
 Personal site. Next.js 16 (App Router, Turbopack) and Tailwind v4, deployed on Vercel.
 
