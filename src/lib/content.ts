@@ -46,8 +46,8 @@ export const about = {
   heading: "Who I am",
   paragraphs: [
     "For the past two years I have built projects at the intersection of financial markets, technology, and entrepreneurship. Most of what I know came from running something real and watching the numbers tell me whether it worked.",
-    "I founded and operate a YouTube content agency that reached a peak of 120 million monthly views. I manage 11 paid editors across seven active channels, oversee production of roughly 150 short form videos a month, and use audience retention data to drive content strategy, operations, and growth decisions.",
-    "On the markets side I trade equity options and run futures prop firm evaluations using order flow, volume profile, and footprint analysis. More recently I used Claude Code to build and backtest a systematic futures order flow engine across more than 200 trading days of tick data.",
+    "I founded and operate a YouTube content agency that reached a peak of 120 million monthly views. I manage 11 paid editors across seven active channels, oversee production of roughly 100 short form videos a month, and use audience retention data to drive content strategy, operations, and growth decisions.",
+    "On the markets side I trade equity options and run futures prop firm evaluations using order flow, volume profile, and footprint analysis. More recently I ran an AI assisted Python simulation to backtest a discretionary order flow model on ES futures tick data across 121 trading days, and the version that held up out of sample produced 84 trades at a 1.94 profit factor.",
     "I am looking for opportunities in financial markets, equity research, fintech, and startup environments where I can contribute through analytical thinking, technical problem solving, and hands on execution. Always open to connect.",
   ],
 } as const;
@@ -67,14 +67,25 @@ export type Experience = {
 
 export const experience: Experience[] = [
   {
+    org: "AugCap LLC",
+    role: "Investment Analyst Intern",
+    location: "Remote",
+    period: "September 2026 to Present",
+    bullets: [
+      "Built five year DCF models on three prospective financial firms the company is evaluating for investment: a neo investment bank, an AI native venture studio, and a private equity search fund.",
+      "Projected each company's path from early operating losses to sustained EBITDA profitability by 2031, deriving unlevered free cash flow and identifying the year each business turns cash flow positive.",
+      "Discounted cash flows using risk adjusted WACC and EBITDA exit multiples calibrated to each company's stage and risk profile, with high, base, and low case sensitivity across all three models.",
+    ],
+  },
+  {
     org: "Independent Trader",
-    role: "Equity Options and Futures",
+    role: "Futures Order Flow and Equity Options",
     location: "Millburn, NJ",
     period: "November 2024 to Present",
     bullets: [
-      "Generated a 30% realized, net of commission YTD return in 2026 on a $10K independently managed account across roughly 100 trades, against a $2K maximum drawdown.",
-      "Trade equity options primarily in mega cap technology, and ES and NQ futures in prop firm evaluations, using volume profile, footprint charts, delta, and order flow signals.",
-      "Keep a detailed journal of entries, exits, and execution errors, and size positions off a fixed risk budget rather than conviction.",
+      "Trade prop firm evaluations with an order flow model on index futures using the DOM, footprint charts, volume profile, and options flow, keeping a 150 plus entry journal of daily biases, entries, exits, and execution errors.",
+      "Generated a 30% realized, net of commission YTD return in 2026 on a $10K independently managed account through equity options swing trades on large cap stocks, against a $2K maximum drawdown.",
+      "Backtested a discretionary order flow model on ES futures tick data across 121 trading days using an AI assisted Python simulation; the version that held up out of sample produced 84 trades at a 1.94 profit factor.",
     ],
   },
   {
@@ -85,7 +96,7 @@ export const experience: Experience[] = [
     period: "June 2024 to Present",
     bullets: [
       "Scaled a solo media operation from 2M to a peak of 120M monthly views within six months and launched approximately 10 channels across multiple content niches.",
-      "Maintain seven active channels and direct production of roughly 150 short form videos per month through standardized scripting, editing, quality control, and publishing workflows.",
+      "Maintain seven active channels and direct production of roughly 100 short form videos per month through standardized scripting, editing, quality control, and publishing workflows.",
       "Lead 11 paid editors and approximately 15 total team members past and present, overseeing hiring, training, performance reviews, workload allocation, and production deadlines.",
       "Generated five figure revenue and built a 2,000 member Discord community by applying retention analytics, creator partnerships, and channel level performance data to growth decisions.",
     ],
@@ -100,8 +111,8 @@ export const experience: Experience[] = [
     period: "June 2026 to Present",
     bullets: [
       "Conduct research under Professor Alex Van Zant, whose scholarship bridges business management and psychology, with emphasis on social judgment, moral self perception, and organizational behavior.",
-      "Analyze and peer review interdisciplinary research examining why individuals perceive themselves as comparatively more moral, or less immoral, than others.",
-      "Evaluate theoretical framing, research methodology, supporting evidence, and conclusions to prepare structured discussion points for continued faculty research.",
+      "Analyzed and peer reviewed three academic studies: why people perceive themselves as holier but less evil than others, why people comply with advice that presents a conflict of interest, and how deception breeds trust.",
+      "Evaluated each study's theoretical framing, research methodology, supporting evidence, and conclusions to prepare structured discussion points for continued faculty research.",
     ],
   },
 ];
@@ -145,21 +156,20 @@ export const projects: Project[] = [
     ],
   },
   {
-    title: "Futures Order Flow Engine",
+    title: "Order Flow Backtest",
     kind: "Quantitative Research",
     period: "2026",
     summary:
-      "A multi timeframe order flow engine built to put a discretionary futures model through a decade of tick data and see what the numbers said about it.",
+      "An AI assisted Python simulation built to test a discretionary order flow model against ES futures tick data and check whether the result held up outside the sample it was built on.",
     bullets: [
-      "Processed 235M ticks across 213 trading days and 240 plus focused market hours, identifying 620 valid setups.",
-      "Backtested 89 simulated trades across those setups, which returned a 64% win rate, a 1.84 profit factor, and a 1.8R average winner against a fixed risk model.",
-      "Encoded volume profile, footprint, and delta signals into reproducible rules, then forward tested them on out of sample data as a check on the backtest.",
-      "Carried the volume profile, footprint, and delta work into how I read and execute trades discretionarily today.",
+      "Backtested a discretionary order flow model on ES futures tick data across 121 trading days, run as an AI assisted Python simulation rather than software engineered by hand.",
+      "The version that held up out of sample produced 84 trades at a 1.94 profit factor.",
+      "Built on the same volume profile, footprint, and delta signals used to read and execute trades discretionarily in the live prop firm evaluation today.",
     ],
     metrics: [
-      { label: "Ticks processed", value: "235M" },
-      { label: "Setups identified", value: "620" },
-      { label: "Backtest win rate", value: "64%" },
+      { label: "Trading days", value: "121" },
+      { label: "Backtest trades", value: "84" },
+      { label: "Profit factor", value: "1.94" },
     ],
   },
   {
@@ -211,12 +221,10 @@ export const education = {
   standing: "Sophomore, 69 credits",
   gpa: "3.96, Dean's List every semester",
   coursework: [
+    "Financial Management",
+    "Statistical Methods in Business",
+    "Business Operations Analytics",
     "Financial Accounting",
-    "Macroeconomics",
-    "Microeconomics",
-    "Supply Chain Management",
-    "Marketing",
-    "Management",
   ],
   involvement: [
     { org: "Little Investment Bankers at Rutgers", role: "Member" },
@@ -240,11 +248,13 @@ export const skillGroups = [
     items: [
       "Financial Markets",
       "Options and Futures Trading",
-      "Technical Analysis",
+      "Depth of Market",
       "Volume Profile",
       "Footprint Charts",
+      "Options Flow",
       "Order Flow Analysis",
-      "Backtesting",
+      "Trade Journaling",
+      "Strategy Backtesting",
       "Risk Management",
     ],
   },
@@ -252,13 +262,13 @@ export const skillGroups = [
     title: "Investment Research and Analytics",
     items: [
       "Equity Research",
+      "Discounted Cash Flow Analysis",
       "Financial Statement Analysis",
       "Equity Valuation",
       "Comparable Company Analysis",
       "Catalyst Analysis",
-      "Financial Modeling",
-      "Business Analytics",
-      "Data Visualization",
+      "Risk and Mitigant Analysis",
+      "Verbal Stock Pitching",
     ],
   },
   {
