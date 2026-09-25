@@ -68,6 +68,7 @@ export type Experience = {
 export const experience: Experience[] = [
   {
     org: "AugCap LLC",
+    logo: "augcap",
     role: "Investment Analyst Intern",
     location: "Remote",
     period: "September 2026 to Present",
