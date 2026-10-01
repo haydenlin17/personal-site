@@ -1,6 +1,12 @@
 /**
  * The channels tracked on /channels.
  *
+ * Placeholder data for the public repo. The channels are run facelessly, and
+ * publishing their real handles here would identify them just as surely as
+ * putting them on the page would, so the handles, ids, names, join dates, and
+ * baseline figures below are invented. The shape matches what the live site
+ * actually reads; see https://haydenlin.com/channels for the real numbers.
+ *
  * `id` is the YouTube channel id (UC...). It is only needed for the Data API
  * path, which reads them all in a single request. The scrape path works from
  * the handle alone.
@@ -22,7 +28,7 @@
  * this and the `baseline` figures every month or so: the window only widens, and
  * a wide window averages away whatever the channels are doing lately.
  */
-export const baselineAt = "2026-08-18T00:19:51Z";
+export const baselineAt = "2026-01-01T00:00:00Z";
 
 export type Channel = {
   handle: string;
@@ -52,45 +58,45 @@ export const privacy = {
 
 export const channels: Channel[] = [
   {
-    handle: "solarusbs",
-    id: "UCCJNM0bh56-EWM1-TOaLT9g",
-    name: "Solarus",
-    niche: "Brawl Stars",
-    startedAt: "2016-08-09",
+    handle: "example-channel-one",
+    id: "UCAAAAAAAAAAAAAAAAAAAAAA",
+    name: "Example Channel One",
+    niche: "Gaming",
+    startedAt: "2020-01-01",
     flagship: true,
-    baseline: { subscribers: 133_000, views: 379_271_229, videos: 738 },
+    baseline: { subscribers: 100_000, views: 50_000_000, videos: 500 },
   },
   {
-    handle: "AcedMemes",
-    id: "UCH__U7gNB-voA0miKoVumew",
-    name: "Ace Memes",
+    handle: "example-channel-two",
+    id: "UCBBBBBBBBBBBBBBBBBBBBBB",
+    name: "Example Channel Two",
     niche: "Memes",
-    startedAt: "2023-07-18",
-    baseline: { subscribers: 15_700, views: 106_992_860, videos: 218 },
+    startedAt: "2021-01-01",
+    baseline: { subscribers: 20_000, views: 10_000_000, videos: 200 },
   },
   {
-    handle: "winterlmfao",
-    id: "UCoCAHJsAr0BFjtPNpuGFWkA",
-    name: "Winter Memes",
+    handle: "example-channel-three",
+    id: "UCCCCCCCCCCCCCCCCCCCCCCC",
+    name: "Example Channel Three",
     niche: "Memes",
-    startedAt: "2025-07-25",
-    baseline: { subscribers: 6_580, views: 48_856_516, videos: 335 },
+    startedAt: "2022-01-01",
+    baseline: { subscribers: 8_000, views: 5_000_000, videos: 150 },
   },
   {
-    handle: "MysticW1nter",
-    id: "UCQYBIMZI8leQdofV3WfYNcg",
-    name: "Winter Top 5",
+    handle: "example-channel-four",
+    id: "UCDDDDDDDDDDDDDDDDDDDDDD",
+    name: "Example Channel Four",
     niche: "Ranking",
-    startedAt: "2025-07-30",
-    baseline: { subscribers: 1_180, views: 1_358_899, videos: 47 },
+    startedAt: "2022-06-01",
+    baseline: { subscribers: 2_000, views: 1_500_000, videos: 60 },
   },
   {
-    handle: "scallyblox",
-    id: "UCu-fx8f0yRhWGizIwX3i8SQ",
-    name: "Scally",
+    handle: "example-channel-five",
+    id: "UCEEEEEEEEEEEEEEEEEEEEEE",
+    name: "Example Channel Five",
     niche: "Roblox",
-    startedAt: "2026-07-21",
-    baseline: { subscribers: 380, views: 186_702, videos: 27 },
+    startedAt: "2023-01-01",
+    baseline: { subscribers: 500, views: 200_000, videos: 30 },
   },
 ];
 
