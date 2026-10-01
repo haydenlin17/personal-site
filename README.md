@@ -124,6 +124,14 @@ subscriber/view count and find the channel behind it). Setting
 the proof screenshots, which is the only configuration that can't be traced
 back at all.
 
+**This public repo ships placeholder channels.** The anonymity above only
+covers what a visitor sees; the source still names the real channels, which
+would undo it the moment the repo went public. `src/lib/channels.ts` here has
+been swapped for channels of the same shape with invented handles, ids, and
+numbers, so the code reads and type-checks the same way the real version does.
+The live site at haydenlin.com deploys from a separate local copy with the
+real data, and the two never meet.
+
 ### Proof screenshots
 
 `proofShots` in `src/lib/channels.ts` lists cropped YouTube Studio realtime
